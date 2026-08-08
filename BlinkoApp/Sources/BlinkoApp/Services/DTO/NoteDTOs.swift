@@ -23,7 +23,7 @@ struct NoteListRequest: Encodable, Sendable {
     /// plain `LIKE` match. Requires AI to be configured on the instance.
     var isUseAiQuery: Bool
 
-    enum OrderDirection: String, Encodable, Sendable {
+    enum OrderDirection: String, Encodable, Sendable, Equatable {
         case ascending = "asc"
         case descending = "desc"
     }
