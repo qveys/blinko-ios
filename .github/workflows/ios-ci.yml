@@ -1,0 +1,53 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same PR/branch — the newest push is the only
+# one whose result matters, and macOS runner minutes are expensive.
+concurrency:
+  group: ios-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The pipeline only reads code and publishes check results.
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          xcrun simctl list runtimes | grep -i ios || true
+
+      - name: Build (iOS Simulator)
+        run: ./scripts/ci-build.sh
+
+      - name: Run unit tests
+        run: ./scripts/ci-test.sh
+
+      # Logs and the .xcresult bundle are the only way to debug a red run after
+      # the runner is destroyed, so retain them regardless of outcome.
+      - name: Upload build logs and test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ci-results
+          path: |
+            build/ci/*.log
+            build/ci/TestResults.xcresult
+          retention-days: 14
+          if-no-files-found: warn
