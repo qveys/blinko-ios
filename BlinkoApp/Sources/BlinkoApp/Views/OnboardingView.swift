@@ -9,7 +9,7 @@ struct OnboardingView: View {
             VStack(spacing: 24) {
                 Image(systemName: "note.text")
                     .font(.system(size: 64))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("Connect to Blinko")
                     .font(.title)
