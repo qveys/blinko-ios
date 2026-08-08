@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
     @State private var serverURLText = ""
+    @State private var tokenText = ""
 
     var body: some View {
         NavigationStack {
@@ -22,13 +23,19 @@ struct OnboardingView: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
 
+                SecureField("Personal access token", text: $tokenText)
+                    .textFieldStyle(.roundedBorder)
+                    .textContentType(.password)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
                 Button("Connect") {
                     guard let url = URL(string: serverURLText) else { return }
                     coordinator.configure(serverURL: url)
-                    coordinator.isAuthenticated = true
+                    Task { await coordinator.signIn(withToken: tokenText) }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(serverURLText.isEmpty)
+                .disabled(serverURLText.isEmpty || tokenText.isEmpty)
             }
             .padding()
             .navigationTitle("Blinko")
