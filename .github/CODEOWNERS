@@ -1,0 +1,14 @@
+# Code owners for blinko-ios.
+#
+# Owners are requested for review automatically on any PR touching a matching
+# path. This file only *requests* review; it becomes *required* review once
+# "Require review from Code Owners" is enabled in the branch protection rule
+# for `main` (see docs/branch-protection.md).
+#
+# Later-matching patterns win, so the catch-all goes first.
+
+* @qveys
+
+# Repository governance — workflow, protection rules, PR process.
+/.github/ @qveys
+/docs/branch-protection.md @qveys
