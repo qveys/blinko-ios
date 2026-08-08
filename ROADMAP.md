@@ -4,103 +4,146 @@
 
 **Project**: blinko-ios-client (BLI)
 
----
-
-## Phase 1: Foundation (Q3 2026)
-
-**Milestone 1.1: Project Setup & Architecture**
-- [ ] BLI-7: Initialize iOS project with SwiftUI + modern architecture
-- [ ] BLI-8: Set up CI/CD pipeline (GitHub Actions, fastlane)
-- [ ] BLI-9: Define data models and API contracts from Blinko backend
-- [ ] BLI-10: Implement authentication flow (login, token management)
-
-**Milestone 1.2: Core Navigation & Home**
-- [ ] BLI-11: Build tab navigation structure (Home, Notes, Search, Settings)
-- [ ] BLI-12: Implement note list view with infinite scroll
-- [ ] BLI-13: Create note detail view with markdown rendering
-- [ ] BLI-14: Add pull-to-refresh and offline caching strategy
+**Company goal**: Build a faithful native iOS client for Blinko
 
 ---
 
-## Phase 2: Core Features (Q4 2026)
+## Guiding principles
 
-**Milestone 2.1: Note Creation & Editing**
-- [ ] BLI-15: Implement note creation flow (compose, save, sync)
-- [ ] BLI-16: Build rich text editor with markdown shortcuts
-- [ ] BLI-17: Add tag management UI (create, assign, filter)
-- [ ] BLI-18: Implement search with full-text indexing
-
-**Milestone 2.2: Media & Attachments**
-- [ ] BLI-19: Add image attachment support (camera, photo library)
-- [ ] BLI-20: Implement file upload with progress indicators
-- [ ] BLI-21: Build media gallery view for note attachments
+- **Web-app fidelity first** — UI/UX, IA, and core flows must mirror Blinko web before expansion.
+- **Server is source of truth** — self-hosted Blinko REST API; offline is cache/draft, not a fork of truth.
+- **Ship foundation before polish** — no App Store strategy yet; working, reviewable client first.
+- **Ticket IDs only when created** — roadmap bullets without links are planned, not yet in the backlog.
 
 ---
 
-## Phase 3: Polish & Advanced (Q1 2027)
+## Foundation already landed
 
-**Milestone 3.1: UX Refinement**
-- [ ] BLI-22: Implement dark mode with system integration
-- [ ] BLI-23: Add haptic feedback and micro-interactions
-- [ ] BLI-24: Optimize performance for large note collections
-- [ ] BLI-25: Implement accessibility features (VoiceOver, Dynamic Type)
-
-**Milestone 3.2: Advanced Features**
-- [ ] BLI-26: Build folder/organization system
-- [ ] BLI-27: Add note sharing and collaboration UI
-- [ ] BLI-28: Implement push notification support
-- [ ] BLI-29: Add export functionality (PDF, markdown)
+| Issue | Status | Deliverable |
+|:------|:-------|:------------|
+| [BLI-3](/BLI/issues/BLI-3) | done | Design system / visual language |
+| [BLI-4](/BLI/issues/BLI-4) | done | System architecture doc |
+| [BLI-7](/BLI/issues/BLI-7) | in_review | Tech stack decisions |
+| [BLI-5](/BLI/issues/BLI-5) / [BLI-13](/BLI/issues/BLI-13) | blocked | GitHub repo + admin setup |
+| [BLI-2](/BLI/issues/BLI-2) | blocked | Branch protection / PR requirements |
 
 ---
 
-## Non-Functional Requirements
+## Phase 1: Foundation (Q3 2026) — active
+
+### Milestone 1.1: Project setup & architecture
+
+| Issue | Work |
+|:------|:-----|
+| [BLI-8](/BLI/issues/BLI-8) | Initialize iOS project (SwiftUI + modern architecture) |
+| [BLI-9](/BLI/issues/BLI-9) | CI/CD pipeline (GitHub Actions, fastlane docs) |
+| [BLI-10](/BLI/issues/BLI-10) | Blinko API contracts + iOS data models |
+| [BLI-11](/BLI/issues/BLI-11) | Authentication flow + Keychain token storage |
+
+**Exit criteria**: App boots on simulator, signs in against a Blinko server, CI builds on PR.
+
+### Milestone 1.2: Core navigation & reading
+
+| Issue / item | Work |
+|:-------------|:-----|
+| [BLI-12](/BLI/issues/BLI-12) | Tab shell (Home, Notes, Search, Settings) |
+| Planned | Note list with pagination / infinite scroll |
+| Planned | Note detail with markdown rendering |
+| Planned | Pull-to-refresh + offline read cache strategy |
+
+**Exit criteria**: Authenticated user can browse and read notes in a shell that matches Blinko IA.
+
+---
+
+## Phase 2: Core features (Q4 2026)
+
+### Milestone 2.1: Note creation & editing
+
+- Note create / edit / delete with server sync
+- Markdown-friendly editor (shortcuts + preview)
+- Tag create / assign / filter
+- Full-text search against Blinko search API
+
+### Milestone 2.2: Media & attachments
+
+- Image attach from camera / photo library
+- File upload with progress
+- Attachment gallery on note detail
+
+**Exit criteria**: Parity with Blinko web for create/edit/tag/search/attachments on a self-hosted instance.
+
+---
+
+## Phase 3: Polish & advanced (Q1 2027)
+
+### Milestone 3.1: UX refinement
+
+- Dark mode aligned with Blinko + system appearance
+- Haptics / micro-interactions where they aid fidelity
+- Performance for large note collections
+- Accessibility: VoiceOver, Dynamic Type
+
+### Milestone 3.2: Advanced features
+
+- Folders / organization matching web
+- Share flows
+- Push notifications (if server supports)
+- Export (markdown / PDF)
+
+**Exit criteria**: Production-quality UX bar; advanced features only after core parity is solid.
+
+---
+
+## Non-functional requirements
 
 **Performance**
-- App launch < 2 seconds
-- Note list scroll 60fps on 10k+ notes
-- Offline support with conflict resolution
+- Cold launch target < 2s on supported devices
+- Smooth scrolling on large note lists
+- Offline read + draft support with conflict strategy documented
 
 **Quality**
-- 80%+ test coverage for business logic
-- Zero critical crashes in production
-- App Store rating target: 4.5+
+- Automated tests for business logic (auth, models, sync)
+- PR review required; crash-free beta bar before any store path
 
 **Security**
-- End-to-end encryption for note content
-- Biometric authentication support
-- Secure token storage (Keychain)
+- Credentials/tokens in Keychain only
+- No secrets in logs or client config committed to git
+- Biometrics as optional unlock later (not Phase 1)
 
 ---
 
-## Dependencies & Risks
+## Dependencies & risks
 
-**External Dependencies**
-- Blinko backend API stability
-- SwiftUI framework maturity for target features
-- App Store review timeline
-
-**Risk Mitigation**
-- API contract versioning to handle backend changes
-- Feature flags for gradual rollout
-- Beta testing program with power users
+| Risk | Mitigation |
+|:-----|:-----------|
+| Blinko API undocumented / unstable | [BLI-10](/BLI/issues/BLI-10) inventory + fixtures; spike follow-ups |
+| GitHub admin / branch protection blocked | [BLI-5](/BLI/issues/BLI-5), [BLI-13](/BLI/issues/BLI-13), [BLI-2](/BLI/issues/BLI-2) |
+| Over-scoping past web parity | PO rejects feature creep; Phase 3 gated on Phase 2 exit |
+| SwiftUI gaps (rich editor) | UIKit interop only where required (see tech stack) |
 
 ---
 
-## Success Metrics
+## Success metrics (directional)
 
-**Adoption**
-- 10k+ active users in first 6 months
-- 30% of web users adopt iOS client
-
-**Engagement**
-- Average session duration > 5 minutes
-- Daily active users > 40% of monthly active users
-
-**Quality**
-- Crash rate < 0.1%
-- Support ticket volume < 2% of active users
+- Web-fidelity review sign-off from Product Owner on auth + notes CRUD + tags + search
+- Crash rate < 0.1% in internal/beta use
+- Session usefulness: users can complete read → edit → sync without falling back to web for core paths
 
 ---
 
-*Roadmap last updated: 2026-08-09*
-*Next review: End of Phase 1*
+## Backlog batch (this roadmap cycle)
+
+Created and ready for engineering:
+
+1. [BLI-8](/BLI/issues/BLI-8) — project init (critical path)
+2. [BLI-9](/BLI/issues/BLI-9) — CI/CD
+3. [BLI-10](/BLI/issues/BLI-10) — API models
+4. [BLI-11](/BLI/issues/BLI-11) — auth
+5. [BLI-12](/BLI/issues/BLI-12) — tab shell
+
+Next backlog generation (when unassigned todos drop below 3): Milestone 1.2 reading flows (list, detail, offline cache).
+
+---
+
+*Roadmap last updated: 2026-08-09*  
+*Owner: Product Owner · Next review: after Milestone 1.1 exit*
