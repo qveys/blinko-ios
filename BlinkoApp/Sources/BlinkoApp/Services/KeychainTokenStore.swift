@@ -33,6 +33,7 @@ actor KeychainTokenStore: TokenStore {
         ]
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
+        KeychainTokenStore.log("read", status: status)
         guard status == errSecSuccess,
               let data = result as? Data,
               let string = String(data: data, encoding: .utf8)
@@ -59,7 +60,8 @@ actor KeychainTokenStore: TokenStore {
             kSecValueData: data,
             kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
         ]
-        SecItemAdd(attributes as CFDictionary, nil)
+        let status = SecItemAdd(attributes as CFDictionary, nil)
+        KeychainTokenStore.log("add", status: status)
     }
 
     private func delete() {
@@ -69,6 +71,15 @@ actor KeychainTokenStore: TokenStore {
             kSecAttrAccount: account,
             kSecUseDataProtectionKeychain: true,
         ]
-        SecItemDelete(query as CFDictionary)
+        let status = SecItemDelete(query as CFDictionary)
+        KeychainTokenStore.log("delete", status: status)
+    }
+
+    /// Prints the SecItem OSStatus for each operation. Diagnostic only — the
+    /// simulator keychain round-trip is failing with no visible reason, and the
+    /// raw status code (errSecMissingEntitlement -34018, errSecParam, etc.)
+    /// tells us which. Stripped once green.
+    private static func log(_ op: String, status: OSStatus) {
+        print("[KeychainTokenStore] \(op) status=\(status)")
     }
 }
