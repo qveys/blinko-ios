@@ -50,6 +50,9 @@
 		A100002E /* NoteEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* NoteEditorViewModel.swift */; };
 		A100002F /* NoteEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* NoteEditorViewModelTests.swift */; };
 		A1000030 /* MarkdownBlockParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* MarkdownBlockParserTests.swift */; };
+		A1000031 /* NotesCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* NotesCacheStore.swift */; };
+		A1000032 /* NotesCacheStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* NotesCacheStoreTests.swift */; };
+		A1000033 /* HomeViewModelOfflineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000035 /* HomeViewModelOfflineTests.swift */; };
 		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
 		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
 		A1000029 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* HTTPClientTests.swift */; };
@@ -103,6 +106,9 @@
 		A2000030 /* NoteEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModel.swift; sourceTree = "<group>"; };
 		A2000031 /* NoteEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModelTests.swift; sourceTree = "<group>"; };
 		A2000032 /* MarkdownBlockParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockParserTests.swift; sourceTree = "<group>"; };
+		A2000033 /* NotesCacheStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCacheStore.swift; sourceTree = "<group>"; };
+		A2000034 /* NotesCacheStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCacheStoreTests.swift; sourceTree = "<group>"; };
+		A2000035 /* HomeViewModelOfflineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelOfflineTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
@@ -227,6 +233,7 @@
 				A2000019 /* APIFixtures.swift */,
 				A200001A /* MockServices.swift */,
 				A2000009 /* NoteService.swift */,
+				A2000033 /* NotesCacheStore.swift */,
 				A200001B /* TagService.swift */,
 			);
 			path = Services;
@@ -244,7 +251,9 @@
 			isa = PBXGroup;
 			children = (
 				A200000C /* HomeViewModelTests.swift */,
+				A2000035 /* HomeViewModelOfflineTests.swift */,
 				A200002D /* HomeViewModelNavigationTests.swift */,
+				A2000034 /* NotesCacheStoreTests.swift */,
 				A2000031 /* NoteEditorViewModelTests.swift */,
 				A2000032 /* MarkdownBlockParserTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
@@ -397,6 +406,7 @@
 				A100001D /* MainTabView.swift in Sources */,
 				A1000018 /* MockServices.swift in Sources */,
 				A1000009 /* NoteService.swift in Sources */,
+				A1000031 /* NotesCacheStore.swift in Sources */,
 				A100001E /* PlaceholderView.swift in Sources */,
 				A100001F /* SettingsTabView.swift in Sources */,
 				A1000019 /* TagService.swift in Sources */,
@@ -417,6 +427,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000C /* HomeViewModelTests.swift in Sources */,
+				A1000033 /* HomeViewModelOfflineTests.swift in Sources */,
+				A1000032 /* NotesCacheStoreTests.swift in Sources */,
 				A100001A /* ModelDecodingTests.swift in Sources */,
 				A100001B /* SyncMetadataTests.swift in Sources */,
 				A1000020 /* TabNavigationTests.swift in Sources */,
