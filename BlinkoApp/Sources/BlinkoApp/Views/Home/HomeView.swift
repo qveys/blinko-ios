@@ -1,5 +1,18 @@
 import SwiftUI
 
+/// The authenticated home surface: a server-backed notes list with empty,
+/// loading, and error states, pull-to-refresh, and navigation to a note's
+/// detail route on tap.
+///
+/// State machine, in priority order:
+/// 1. First load → skeleton rows (not a centered spinner — the web list does
+///    not jump height once content arrives).
+/// 2. Load failed → error state with Retry.
+/// 3. No notes → empty state.
+/// 4. Otherwise → the list.
+///
+/// A 401 failure sets `requiresReauthentication`; the alert offers a
+/// "Sign In Again" button that the coordinator consumes via the binding.
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
 
@@ -10,9 +23,9 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if viewModel.notes.isEmpty, !viewModel.errorMessage.isEmpty {
+                if viewModel.isLoading && viewModel.notes.isEmpty {
+                    loadingState
+                } else if viewModel.notes.isEmpty, viewModel.showError {
                     errorState
                 } else if viewModel.notes.isEmpty {
                     emptyState
@@ -26,11 +39,28 @@ struct HomeView: View {
                     Button(action: viewModel.composeNote) {
                         Image(systemName: "square.and.pencil")
                     }
+                    .accessibilityLabel("New note")
                 }
+            }
+            .navigationDestination(item: $viewModel.selectedNote) { note in
+                NoteDetailView(viewModel: viewModel, note: note)
+            }
+            .navigationDestination(isPresented: $viewModel.composeRequested) {
+                ComposePlaceholderView()
             }
         }
         .task { await viewModel.loadNotes() }
-        .alert("Error", isPresented: $viewModel.showError) {
+        .alert("Session expired", isPresented: $viewModel.requiresReauthentication) {
+            Button("Sign In Again", role: .none) {
+                // The coordinator observes this; it will tear down the shell.
+                NotificationCenter.default.post(name: .requiresReauthentication, object: nil)
+            }
+            Button("Dismiss", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage)
+        }
+        .alert("Couldn't load notes", isPresented: $viewModel.showError) {
+            Button("Retry", action: { Task { await viewModel.loadNotes() } })
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage)
@@ -49,7 +79,7 @@ struct HomeView: View {
         ContentUnavailableView(
             "Couldn't Load Notes",
             systemImage: "exclamationmark.triangle",
-            description: Text(viewModel.errorMessage)
+            description: Text(viewModel.errorMessage.isEmpty ? "Check your connection and try again." : viewModel.errorMessage)
         )
     }
 
@@ -57,6 +87,8 @@ struct HomeView: View {
         List {
             ForEach(viewModel.notes) { note in
                 NoteRowView(note: note)
+                    .contentShape(Rectangle())
+                    .onTapGesture { viewModel.open(note) }
                     // Kicks off the next page as the last row appears.
                     .onAppear {
                         guard note.id == viewModel.notes.last?.id else { return }
@@ -74,4 +106,40 @@ struct HomeView: View {
         .listStyle(.plain)
         .refreshable { await viewModel.loadNotes() }
     }
+
+    /// Skeleton rows that match the real row height, so the list does not
+    /// resize when content arrives.
+    private var loadingState: some View {
+        List {
+            ForEach(0..<6, id: \.self) { _ in
+                VStack(alignment: .leading, spacing: 8) {
+                    RoundedRectangle(cornerRadius: 6).fill(Color.secondary.opacity(0.15)).frame(height: 16)
+                    RoundedRectangle(cornerRadius: 6).fill(Color.secondary.opacity(0.15)).frame(height: 12).frame(width: 200, alignment: .leading)
+                }
+                .padding(.vertical, 6)
+                .redacted(reason: .placeholder)
+            }
+        }
+        .listStyle(.plain)
+    }
 }
+
+extension Notification.Name {
+    /// Posted when a 401 should route the user back to sign-in. Observed by
+    /// the app coordinator, which owns the auth shell.
+    static let requiresReauthentication = Notification.Name("requiresReauthentication")
+}
+
+#if DEBUG
+#Preview("Home — content") {
+    NavigationStack {
+        HomeView(noteService: MockNoteService(delay: .milliseconds(0)))
+    }
+}
+
+#Preview("Home — error") {
+    NavigationStack {
+        HomeView(noteService: MockNoteService.failing(APIError.transport("offline")))
+    }
+}
+#endif

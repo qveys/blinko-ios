@@ -23,5 +23,11 @@ struct RootView: View {
         .onChange(of: coordinator.isAuthenticated) { _, authenticated in
             if !authenticated { tabSelection.select(.home) }
         }
+        // Listens for the `requiresReauthentication` notification posted from
+        // `HomeView` when a 401 surfaces; tears down the session so the user
+        // is routed back to onboarding.
+        .onReceive(NotificationCenter.default.publisher(for: .requiresReauthentication)) { _ in
+            Task { await coordinator.handleUnauthorized() }
+        }
     }
 }
