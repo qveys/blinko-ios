@@ -8,6 +8,9 @@ struct BlinkoApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(appCoordinator)
+                .task {
+                    await appCoordinator.restoreSession()
+                }
         }
     }
 }

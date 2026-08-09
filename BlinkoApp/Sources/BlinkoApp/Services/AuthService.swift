@@ -15,9 +15,9 @@ protocol AuthServiceProtocol: Sendable {
 /// from Blinko's settings UI, which goes into the same token store.
 final class AuthService: AuthServiceProtocol {
     private let httpClient: any HTTPClient
-    private let tokenStore: InMemoryTokenStore
+    private let tokenStore: any TokenStore
 
-    init(httpClient: any HTTPClient, tokenStore: InMemoryTokenStore) {
+    init(httpClient: any HTTPClient, tokenStore: any TokenStore) {
         self.httpClient = httpClient
         self.tokenStore = tokenStore
     }
