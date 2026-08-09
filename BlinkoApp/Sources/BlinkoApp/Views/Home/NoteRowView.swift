@@ -6,6 +6,8 @@ import SwiftUI
 /// - status indicators (pinned / todo / attachments) + relative time
 /// - title: first non-empty line, heading markers stripped, semibold
 /// - snippet: remaining lines, two-line limit, secondary
+/// - image attachment thumbnails (capped, "+N" overflow badge)
+/// - non-image attachments as compact file rows
 /// - tag chips, derived from the note's parsed tags
 ///
 /// The presentation follows Blinko web: ordering is server-driven (`orderBy:
@@ -29,6 +31,14 @@ struct NoteRowView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+            }
+
+            if !note.imageAttachments.isEmpty {
+                AttachmentThumbnailGrid(images: note.imageAttachments)
+            }
+
+            ForEach(note.fileAttachments) { attachment in
+                AttachmentFileRow(attachment: attachment)
             }
 
             if !note.tags.isEmpty {

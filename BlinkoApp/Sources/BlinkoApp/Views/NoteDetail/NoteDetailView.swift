@@ -93,6 +93,10 @@ struct NoteDetailView: View {
             MarkdownContentView(markdown: detail.content)
         }
 
+        if !detail.attachments.isEmpty {
+            NoteAttachmentsSection(note: detail)
+        }
+
         if !detail.tags.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Tags")

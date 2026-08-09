@@ -15,6 +15,9 @@ final class ServiceContainer: ObservableObject {
     let noteService: any NoteServiceProtocol
     let tagService: any TagServiceProtocol
     let authService: any AuthServiceProtocol
+    /// Authenticated loader for `/api/file/*` content — attachment images and
+    /// QuickLook downloads. Injected into the view environment by `MainTabView`.
+    let attachmentLoader: any AttachmentAssetLoading
 
     init(serverURL: URL, session: URLSession = .shared, tokenStore: any TokenStore = KeychainTokenStore()) {
         self.serverURL = serverURL
@@ -28,6 +31,11 @@ final class ServiceContainer: ObservableObject {
         self.noteService = NoteService(httpClient: httpClient)
         self.tagService = TagService(httpClient: httpClient)
         self.authService = AuthService(httpClient: httpClient, tokenStore: tokenStore)
+        self.attachmentLoader = AttachmentAssetLoader(
+            serverURL: serverURL,
+            session: session,
+            tokenProvider: tokenStore
+        )
     }
 
     /// Container built from explicit services, for previews and tests.
@@ -36,12 +44,15 @@ final class ServiceContainer: ObservableObject {
         tokenStore: any TokenStore,
         noteService: any NoteServiceProtocol,
         tagService: any TagServiceProtocol,
-        authService: any AuthServiceProtocol
+        authService: any AuthServiceProtocol,
+        attachmentLoader: (any AttachmentAssetLoading)? = nil
     ) {
         self.serverURL = serverURL
         self.tokenStore = tokenStore
         self.noteService = noteService
         self.tagService = tagService
         self.authService = authService
+        self.attachmentLoader = attachmentLoader
+            ?? AttachmentAssetLoader(serverURL: serverURL, tokenProvider: tokenStore)
     }
 }

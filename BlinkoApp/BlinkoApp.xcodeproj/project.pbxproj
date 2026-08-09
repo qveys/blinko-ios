@@ -50,6 +50,15 @@
 		A100002E /* NoteEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* NoteEditorViewModel.swift */; };
 		A100002F /* NoteEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* NoteEditorViewModelTests.swift */; };
 		A1000030 /* MarkdownBlockParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* MarkdownBlockParserTests.swift */; };
+		A1000040 /* Attachment+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000040 /* Attachment+Display.swift */; };
+		A1000041 /* AttachmentAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000041 /* AttachmentAssetLoader.swift */; };
+		A1000042 /* AttachmentImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000042 /* AttachmentImageView.swift */; };
+		A1000043 /* AttachmentThumbnailGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000043 /* AttachmentThumbnailGrid.swift */; };
+		A1000044 /* AttachmentFileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000044 /* AttachmentFileRow.swift */; };
+		A1000045 /* AttachmentImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* AttachmentImageViewer.swift */; };
+		A1000046 /* NoteAttachmentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000046 /* NoteAttachmentsSection.swift */; };
+		A1000047 /* AttachmentDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* AttachmentDisplayTests.swift */; };
+		A1000048 /* AttachmentAssetLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000048 /* AttachmentAssetLoaderTests.swift */; };
 		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
 		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
 		A1000029 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* HTTPClientTests.swift */; };
@@ -103,6 +112,15 @@
 		A2000030 /* NoteEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModel.swift; sourceTree = "<group>"; };
 		A2000031 /* NoteEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModelTests.swift; sourceTree = "<group>"; };
 		A2000032 /* MarkdownBlockParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockParserTests.swift; sourceTree = "<group>"; };
+		A2000040 /* Attachment+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Attachment+Display.swift"; sourceTree = "<group>"; };
+		A2000041 /* AttachmentAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentAssetLoader.swift; sourceTree = "<group>"; };
+		A2000042 /* AttachmentImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentImageView.swift; sourceTree = "<group>"; };
+		A2000043 /* AttachmentThumbnailGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentThumbnailGrid.swift; sourceTree = "<group>"; };
+		A2000044 /* AttachmentFileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentFileRow.swift; sourceTree = "<group>"; };
+		A2000045 /* AttachmentImageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentImageViewer.swift; sourceTree = "<group>"; };
+		A2000046 /* NoteAttachmentsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteAttachmentsSection.swift; sourceTree = "<group>"; };
+		A2000047 /* AttachmentDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentDisplayTests.swift; sourceTree = "<group>"; };
+		A2000048 /* AttachmentAssetLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentAssetLoaderTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
@@ -159,6 +177,7 @@
 				A4000006 /* Home */,
 				A400000C /* NoteDetail */,
 				A400000D /* Compose */,
+				A400000E /* Attachments */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -176,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000010 /* Attachment.swift */,
+				A2000040 /* Attachment+Display.swift */,
 				A2000008 /* Note.swift */,
 				A2000024 /* Note+Display.swift */,
 				A200002E /* MarkdownBlock.swift */,
@@ -214,10 +234,23 @@
 			path = Compose;
 			sourceTree = "<group>";
 		};
+		A400000E /* Attachments */ = {
+			isa = PBXGroup;
+			children = (
+				A2000042 /* AttachmentImageView.swift */,
+				A2000043 /* AttachmentThumbnailGrid.swift */,
+				A2000044 /* AttachmentFileRow.swift */,
+				A2000045 /* AttachmentImageViewer.swift */,
+				A2000046 /* NoteAttachmentsSection.swift */,
+			);
+			path = Attachments;
+			sourceTree = "<group>";
+		};
 		A4000007 /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				A2000014 /* APIError.swift */,
+				A2000041 /* AttachmentAssetLoader.swift */,
 				A2000015 /* AuthService.swift */,
 				A2000016 /* BlinkoAPI.swift */,
 				A2000017 /* AuthDTOs.swift */,
@@ -254,6 +287,8 @@
 				A200002A /* AppCoordinatorTests.swift */,
 				A200002B /* HTTPClientTests.swift */,
 				A200002C /* NoteDisplayTests.swift */,
+				A2000047 /* AttachmentDisplayTests.swift */,
+				A2000048 /* AttachmentAssetLoaderTests.swift */,
 			);
 			path = Tests/BlinkoAppTests;
 			sourceTree = SOURCE_ROOT;
@@ -384,6 +419,13 @@
 				A100000D /* ServiceContainer.swift in Sources */,
 				A100001C /* BlinkoTab.swift in Sources */,
 				A100000E /* Attachment.swift in Sources */,
+				A1000040 /* Attachment+Display.swift in Sources */,
+				A1000041 /* AttachmentAssetLoader.swift in Sources */,
+				A1000042 /* AttachmentImageView.swift in Sources */,
+				A1000043 /* AttachmentThumbnailGrid.swift in Sources */,
+				A1000044 /* AttachmentFileRow.swift in Sources */,
+				A1000045 /* AttachmentImageViewer.swift in Sources */,
+				A1000046 /* NoteAttachmentsSection.swift in Sources */,
 				A100000F /* SyncMetadata.swift in Sources */,
 				A1000010 /* Tag.swift in Sources */,
 				A1000011 /* User.swift in Sources */,
@@ -427,6 +469,8 @@
 				A100002B /* HomeViewModelNavigationTests.swift in Sources */,
 				A100002F /* NoteEditorViewModelTests.swift in Sources */,
 				A1000030 /* MarkdownBlockParserTests.swift in Sources */,
+				A1000047 /* AttachmentDisplayTests.swift in Sources */,
+				A1000048 /* AttachmentAssetLoaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
