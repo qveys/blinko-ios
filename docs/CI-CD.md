@@ -23,7 +23,8 @@ needs — see [Branch protection](#branch-protection) below.
 
 | Workflow | File | Trigger | Purpose |
 |---|---|---|---|
-| **Triage** | `.github/workflows/triage.yml` | PR open/edit/reopen/sync; issue open/edit/reopen; `/triage` on a PR (OWNER/MEMBER only) | Auto-label by path (`.github/labeler.yml`), normalize titles to conventional-commit style |
+| **Normalize titles** | `.github/workflows/normalize-titles.yml` | Issue/PR open/edit/reopen | Prefix title with a type emoji + conventional-commit shape (`✨ feat(scope): …`) |
+| **Triage** | `.github/workflows/triage.yml` | PR open/edit/reopen/sync; `/triage` on a PR (OWNER/MEMBER only) | Auto-label by path (`.github/labeler.yml`) |
 | **Sync Labels** | `.github/workflows/sync-labels.yml` | Push to `main` touching `.github/labels.yml` or `.github/workflows/sync-labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
 | **Stale** | `.github/workflows/stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
 
