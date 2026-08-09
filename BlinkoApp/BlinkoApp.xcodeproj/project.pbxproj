@@ -88,8 +88,8 @@
 		A2000021 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsTabView.swift; sourceTree = "<group>"; };
 		A2000022 /* TabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabNavigationTests.swift; sourceTree = "<group>"; };
 		A2000023 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
-		A2000024 /* Note+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note+Display.swift; sourceTree = "<group>"; };
-		A2000025 /* Tag+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag+Display.swift; sourceTree = "<group>"; };
+		A2000024 /* Note+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Note+Display.swift"; sourceTree = "<group>"; };
+		A2000025 /* Tag+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tag+Display.swift"; sourceTree = "<group>"; };
 		A2000026 /* NoteTagChipRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTagChipRow.swift; sourceTree = "<group>"; };
 		A2000027 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
 		A2000028 /* ComposePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePlaceholderView.swift; sourceTree = "<group>"; };
