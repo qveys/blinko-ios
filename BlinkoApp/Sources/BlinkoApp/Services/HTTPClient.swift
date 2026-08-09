@@ -13,9 +13,19 @@ enum HTTPMethod: String, Sendable {
 /// `note/detail` are `POST` with a JSON body, because they are tRPC mutations
 /// and queries mapped onto HTTP.
 struct APIRequest: Sendable {
+    /// A pre-encoded, non-JSON payload — used by `file/upload`, which takes
+    /// `multipart/form-data` instead of a JSON body.
+    struct RawBody: Sendable {
+        let data: Data
+        /// Full Content-Type header value, including any boundary parameter.
+        let contentType: String
+    }
+
     let path: String
     let method: HTTPMethod
     let body: (any Encodable & Sendable)?
+    /// Mutually exclusive with `body`; wins when both are set.
+    let rawBody: RawBody?
     let queryItems: [URLQueryItem]
     /// Set false for endpoints that must not carry credentials.
     let requiresAuth: Bool
@@ -24,12 +34,14 @@ struct APIRequest: Sendable {
         path: String,
         method: HTTPMethod,
         body: (any Encodable & Sendable)? = nil,
+        rawBody: RawBody? = nil,
         queryItems: [URLQueryItem] = [],
         requiresAuth: Bool = true
     ) {
         self.path = path
         self.method = method
         self.body = body
+        self.rawBody = rawBody
         self.queryItems = queryItems
         self.requiresAuth = requiresAuth
     }
@@ -203,7 +215,10 @@ final class URLSessionHTTPClient: HTTPClient {
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        if let body = request.body {
+        if let rawBody = request.rawBody {
+            urlRequest.httpBody = rawBody.data
+            urlRequest.setValue(rawBody.contentType, forHTTPHeaderField: "Content-Type")
+        } else if let body = request.body {
             do {
                 urlRequest.httpBody = try encoder.encode(body)
             } catch {

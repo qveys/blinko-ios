@@ -185,25 +185,46 @@ rewrites the `#tag` text inside every affected note's content.
 ## 5. Attachments
 
 Upload is `POST /api/file/upload`, `multipart/form-data`, field name `file`.
+Bearer auth is required; the route answers `401 {"error": "Unauthorized"}`
+without it. Verified against upstream `server/routerExpress/file/upload.ts`
+(busboy parser) and the web client (`useEditor.ts`, vditor `fieldName: 'file'`).
 
 ```jsonc
-// response — note the capitalized "Message"
+// response — note the capitalized "Message" and the filePath/fileName keys
 { "Message": "Success", "status": 200,
-  "path": "/api/file/1712345678-photo.png",
+  "filePath": "/api/file/1712345678-photo.png",
+  "fileName": "1712345678-photo.png",
   "type": "image/png", "size": 20480 }
 ```
 
-Quirks, all handled in `AttachmentUploadResponse`:
+Quirks, all handled in `AttachmentUploadResponse` and `AttachmentService`:
 
 - `Message` is capitalized. This route is hand-written and does not follow the
   generated routes' casing.
-- The response has **no `name`** — it is filled in client-side from the path's
-  last component, because `note/upsert` requires one.
+- The storage keys are **`filePath`/`fileName`**, not `path`/`name`: the route
+  spreads `FileService.uploadFileStream`'s return value into the response, and
+  the web client destructures `{fileName, filePath, type, size}`. The decoder
+  still accepts `path` as a legacy fallback and derives the name from the
+  path's last component when `fileName` is absent.
+- The stored name is not the uploaded name: the server collapses whitespace to
+  `_`, sanitizes reserved characters, and prefixes a timestamp on collision.
+  Use the returned `fileName`, not the local filename, in `note/upsert`.
 - `size` arrives as a JSON number *or* a string, because the column is a SQL
   `Decimal` and drivers serialize it inconsistently. `decodeFlexibleInt64`
   accepts both. Same applies anywhere a `Decimal` surfaces.
-- `path` is **server-relative**, not an absolute URL. Resolve with
-  `Attachment.url(relativeTo:)`.
+- `filePath` is **server-relative** (`/api/file/...`) for local storage but an
+  **absolute URL** for S3-backed deployments. `Attachment.url(relativeTo:)`
+  handles both, since resolving an absolute URL against a base is a no-op.
+- Errors use the file-route envelope `{"error": "..."}`: `401` unauthorized,
+  `400` for a non-multipart body or no `file` part, `500 {"error": "Upload
+  failed"}` for storage failures (retryable). There is no server-side size
+  limit in the route itself (`req.setTimeout(0)`, no busboy `limits`) — size
+  caps come from the reverse proxy, so oversized uploads surface as `413` or a
+  transport error depending on deployment.
+- Extra multipart fields (`isUserVoiceRecording`, `audioDuration`,
+  `audioDurationSeconds`) exist for voice notes; text fields are read before
+  the `file` part, so senders should order them first. Not used by this app
+  yet.
 
 Uploading does not attach the file to anything. To attach, upload first, then
 `note/upsert` with the returned metadata in `attachments`.
