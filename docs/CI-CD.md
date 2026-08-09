@@ -1,8 +1,10 @@
 # CI/CD
 
-Automated build and test validation for the Blinko iOS client.
+Automated build, test, and repository governance for the Blinko iOS client.
 
-## Pipeline
+## Pipelines
+
+### Build and test
 
 `.github/workflows/ios-ci.yml` runs on every pull request to `main`, every push
 to `main`, and on manual dispatch.
@@ -16,6 +18,31 @@ to `main`, and on manual dispatch.
 
 The job name is what appears in PR checks and is the string branch protection
 needs — see [Branch protection](#branch-protection) below.
+
+### Repository governance
+
+| Workflow | File | Trigger | Purpose |
+|---|---|---|---|
+| **Triage** | `.github/workflows/triage.yml` | PR open/edit/reopen/sync; issue open/edit/reopen; `/triage` on a PR (OWNER/MEMBER only) | Auto-label by path (`.github/labeler.yml`), normalize titles to conventional-commit style |
+| **Sync Labels** | `.github/workflows/sync-labels.yml` | Push to `main` touching `.github/labels.yml` or `.github/workflows/sync-labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
+| **Stale** | `.github/workflows/stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
+
+Labels are defined in `.github/labels.yml` (source of truth). Path → area mapping
+lives in `.github/labeler.yml`. The labeler step uses `sync-labels: true` so
+obsolete **Area** labels are removed when paths no longer match; Type / Priority /
+Effort / Platform and other labels outside `labeler.yml` stay manual.
+
+Issue forms live under `.github/ISSUE_TEMPLATE/` (bug report, feature request).
+Blank issues are disabled; server, API, and product questions are directed to
+upstream Blinko via the contact link in `config.yml`.
+Dependabot (`.github/dependabot.yml`) bumps GitHub Actions weekly and will open
+Swift Package Manager updates under `BlinkoApp/` once remote deps exist.
+
+**Not ported** from other repos on purpose:
+
+- **Release packaging** — no App Store / TestFlight automation yet (see [Release automation](#release-automation-fastlane)).
+- **npm audit / Node test** — this is a Swift/Xcode project; security surface is different.
+- **GitHub Pages** — no privacy/support static site in this repo.
 
 ## Local equivalents
 
