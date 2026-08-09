@@ -23,9 +23,9 @@ needs — see [Branch protection](#branch-protection) below.
 
 | Workflow | File | Trigger | Purpose |
 |---|---|---|---|
-| **Triage** | `triage.yml` | PR open/edit/sync; issue open/edit; `/triage` comment | Auto-label by path (`labeler.yml`), normalize titles to conventional-commit style |
-| **Sync Labels** | `sync-labels.yml` | Push to `main` touching `labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
-| **Stale** | `stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
+| **Triage** | `.github/workflows/triage.yml` | PR open/edit/sync; issue open/edit; `/triage` comment | Auto-label by path (`.github/labeler.yml`), normalize titles to conventional-commit style |
+| **Sync Labels** | `.github/workflows/sync-labels.yml` | Push to `main` touching `labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
+| **Stale** | `.github/workflows/stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
 
 Labels are defined in `.github/labels.yml` (source of truth). Path → area mapping
 lives in `.github/labeler.yml`. Type / Priority / Effort labels stay manual

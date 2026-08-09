@@ -47,7 +47,7 @@
           - "BlinkoApp/Sources/BlinkoApp/Services/NoteService.swift"
           - "BlinkoApp/Sources/BlinkoApp/Services/DTO/NoteDTOs.swift"
           - "BlinkoApp/Sources/BlinkoApp/Views/Home/**/*"
-          - "BlinkoApp/Sources/BlinkoApp/Models/Note.swift"
+          # Models/Note.swift is covered by Area: Models only (no double-label).
 
 "🧩 Area: Onboarding":
   - changed-files:
@@ -62,14 +62,14 @@
 "🧩 Area: Sync":
   - changed-files:
       - any-glob-to-any-file:
-          - "BlinkoApp/Sources/BlinkoApp/Models/SyncMetadata.swift"
+          # Models/SyncMetadata.swift is covered by Area: Models only.
           - "BlinkoApp/Tests/BlinkoAppTests/SyncMetadataTests.swift"
 
 "🧩 Area: Tags":
   - changed-files:
       - any-glob-to-any-file:
           - "BlinkoApp/Sources/BlinkoApp/Services/TagService.swift"
-          - "BlinkoApp/Sources/BlinkoApp/Models/Tag.swift"
+          # Models/Tag.swift is covered by Area: Models only.
 
 "🧩 Area: Tests":
   - changed-files:
