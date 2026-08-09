@@ -21,8 +21,10 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
 
-    init(noteService: any NoteServiceProtocol) {
-        _viewModel = StateObject(wrappedValue: HomeViewModel(noteService: noteService))
+    init(noteService: any NoteServiceProtocol, cacheStore: (any NotesCacheStore)? = nil) {
+        _viewModel = StateObject(
+            wrappedValue: HomeViewModel(noteService: noteService, cacheStore: cacheStore)
+        )
     }
 
     var body: some View {
@@ -89,7 +91,38 @@ struct HomeView: View {
         )
     }
 
+    /// Shown above the list when the content on screen could not be refreshed
+    /// and may be out of date. Pull-to-refresh is the retry affordance.
+    private var offlineBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "wifi.slash")
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Showing offline copy")
+                    .font(.footnote.weight(.semibold))
+                if let timestamp = viewModel.staleDataTimestamp {
+                    Text("Last updated \(timestamp.formatted(.relative(presentation: .named)))")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.yellow.opacity(0.15))
+        .accessibilityElement(children: .combine)
+    }
+
     private var notesList: some View {
+        VStack(spacing: 0) {
+            if viewModel.isShowingStaleData {
+                offlineBanner
+            }
+            notesListRows
+        }
+    }
+
+    private var notesListRows: some View {
         List {
             ForEach(viewModel.notes) { note in
                 NoteRowView(note: note)

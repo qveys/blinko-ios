@@ -15,6 +15,15 @@ final class HomeViewModel: ObservableObject {
 
     private(set) var syncMetadata = SyncMetadata.initial
 
+    /// Non-nil when the list is showing stale content after a failed refresh —
+    /// restored from the offline cache on a cold launch, or left on screen
+    /// when pull-to-refresh could not reach the server. The value is when that
+    /// content was last successfully fetched, shown in the offline banner.
+    /// Cleared by the next successful refresh.
+    @Published private(set) var staleDataTimestamp: Date?
+
+    var isShowingStaleData: Bool { staleDataTimestamp != nil }
+
     /// The note the user just tapped, pushed onto the detail route. `nil`
     /// when the list is showing. Drives a `navigationDestination` in
     /// `HomeView`, so tapping different rows swaps the detail screen without a
@@ -25,13 +34,31 @@ final class HomeViewModel: ObservableObject {
     /// list can reuse the same service instance.
     let noteService: any NoteServiceProtocol
 
-    init(noteService: any NoteServiceProtocol) {
+    /// Optional so previews and screens that don't need offline fallback can
+    /// omit it; `nil` disables caching entirely.
+    private let cacheStore: (any NotesCacheStore)?
+
+    init(noteService: any NoteServiceProtocol, cacheStore: (any NotesCacheStore)? = nil) {
         self.noteService = noteService
+        self.cacheStore = cacheStore
     }
 
-    var canLoadMore: Bool { syncMetadata.hasMore && !isLoading && !isLoadingMore }
+    /// Paging is suppressed while showing stale data: the cache only holds the
+    /// first page, and the server that would serve page 2 is unreachable.
+    var canLoadMore: Bool {
+        syncMetadata.hasMore && !isLoading && !isLoadingMore && !isShowingStaleData
+    }
 
     /// Loads the first page, replacing whatever is on screen.
+    ///
+    /// Offline behavior: a successful load replaces the persisted cache
+    /// wholesale (which is also how server-side deletions reconcile — the
+    /// fresh payload simply no longer contains them). A *retryable* failure
+    /// (offline, timeout, 5xx) falls back to cached content instead of an
+    /// empty error screen, flagged stale via ``staleDataTimestamp``. A
+    /// non-retryable failure (401, 403, validation) never reads the cache —
+    /// notably a 401 must route to sign-in, not show the previous session's
+    /// notes.
     func loadNotes() async {
         guard !isLoading else { return }
         isLoading = true
@@ -43,10 +70,33 @@ final class HomeViewModel: ObservableObject {
             let page = try await noteService.fetchNotes(request)
             notes = page
             syncMetadata.recordLoadedPage(page, page: 1)
+            staleDataTimestamp = nil
             clearError()
+            await cacheStore?.save(notes: page, savedAt: Date())
         } catch {
-            present(error)
+            if isRetryable(error), let cached = await cacheStore?.load() {
+                // Server unreachable but we have a previous payload: show it
+                // as stale rather than erroring. Keep whatever is already on
+                // screen if it's fresher than the cache file (e.g. a refresh
+                // failing after a successful launch load).
+                if notes.isEmpty {
+                    notes = cached.notes
+                }
+                staleDataTimestamp = syncMetadata.lastSyncedAt ?? cached.savedAt
+                clearError()
+            } else if isRetryable(error), !notes.isEmpty {
+                // No cache store (or empty cache) but content is on screen:
+                // preserve it, banner instead of alert.
+                staleDataTimestamp = syncMetadata.lastSyncedAt ?? staleDataTimestamp
+                clearError()
+            } else {
+                present(error)
+            }
         }
+    }
+
+    private func isRetryable(_ error: any Error) -> Bool {
+        (error as? APIError)?.isRetryable ?? false
     }
 
     /// Appends the next page. No-op when a load is in flight or the list is
