@@ -21,7 +21,9 @@ final class HomeViewModel: ObservableObject {
     /// hand-rolled `NavigationStack` path.
     @Published var selectedNote: Note?
 
-    private let noteService: any NoteServiceProtocol
+    /// Internal (not private) so the detail/editor screens spawned from this
+    /// list can reuse the same service instance.
+    let noteService: any NoteServiceProtocol
 
     init(noteService: any NoteServiceProtocol) {
         self.noteService = noteService
@@ -89,13 +91,42 @@ final class HomeViewModel: ObservableObject {
         selectedNote = nil
     }
 
-    /// Compose destination. BLI-20 owns the editor; until then the compose
-    /// button is exposed but routes to a lightweight placeholder so it is not a
-    /// silent no-op. `composeRequested` lets the view drive its own route.
+    /// Compose destination: `true` routes to the note editor in create mode.
     @Published var composeRequested = false
 
     func composeNote() {
         composeRequested = true
+    }
+
+    /// Merges a note the editor just saved into the list.
+    ///
+    /// A created note is prepended (the feed is `updatedAt desc`, and the new
+    /// note is by definition the freshest); an edited note is updated in
+    /// place without re-sorting, mirroring how `togglePin` avoids reshuffling
+    /// rows under the user's finger. Pull-to-refresh restores exact server
+    /// order.
+    func noteSaved(_ note: Note) {
+        if let index = notes.firstIndex(where: { $0.id == note.id }) {
+            notes[index] = note
+        } else {
+            notes.insert(note, at: 0)
+        }
+    }
+
+    /// Called by the detail screen after it successfully trashed the note it
+    /// was showing: drop the row and pop back to the list.
+    func noteTrashed(id: Int) {
+        notes.removeAll { $0.id == id }
+        dismissDetail()
+    }
+
+    /// Moves a note to the recycle bin on behalf of the detail screen.
+    /// Unlike `trashNote(id:)` this does not touch the list on failure and
+    /// rethrows, so the detail view can keep showing the note and surface
+    /// the error itself.
+    func trashFromDetail(id: Int) async throws {
+        try await noteService.trash(ids: [id])
+        noteTrashed(id: id)
     }
 
     /// Fetches the latest copy of a note (used by the detail view on open).

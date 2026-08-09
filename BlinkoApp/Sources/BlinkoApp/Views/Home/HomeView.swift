@@ -50,7 +50,10 @@ struct HomeView: View {
             NoteDetailView(viewModel: viewModel, note: note)
         }
         .navigationDestination(isPresented: $viewModel.composeRequested) {
-            ComposePlaceholderView()
+            NoteEditorView(
+                noteService: viewModel.noteService,
+                onSaved: viewModel.noteSaved
+            )
         }
         .task { await viewModel.loadNotes() }
         .alert("Session expired", isPresented: $viewModel.requiresReauthentication) {

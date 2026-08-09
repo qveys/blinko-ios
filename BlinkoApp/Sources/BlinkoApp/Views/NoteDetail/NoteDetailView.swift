@@ -1,13 +1,14 @@
 import SwiftUI
 
-/// Read view for a single note: full content, tags, metadata, and the
-/// non-destructive affordances available from a list tap.
+/// Read view for a single note: markdown-rendered content, tags, metadata,
+/// and the note-level actions (pin, edit, delete).
 ///
-/// Editing (inline markdown edit + save) is BLI-20's scope; this view is
-/// intentionally read-only but structured — content is rendered in a
-/// `ScrollView` with a toolbar that BLI-20 can swap for an edit button. The
-/// destructive actions (`trash`, `pin`) are wired through the owning
-/// ``HomeViewModel`` so the list stays in sync when the user comes back.
+/// Editing pushes ``NoteEditorView`` pre-filled with the note's markdown;
+/// a successful save updates both this screen and the owning list through
+/// ``HomeViewModel/noteSaved(_:)``. Delete asks for confirmation first
+/// (destructive), soft-deletes into the recycle bin — the same semantics as
+/// Blinko web's delete — and pops back to the list only when the server call
+/// succeeds.
 struct NoteDetailView: View {
     @ObservedObject var viewModel: HomeViewModel
     let note: Note
@@ -16,6 +17,11 @@ struct NoteDetailView: View {
     @State private var loadError: String?
     @State private var showError = false
     @State private var isReloading = false
+    @State private var editRequested = false
+    @State private var confirmDelete = false
+    @State private var isDeleting = false
+    @State private var deleteError: String?
+    @State private var showDeleteError = false
 
     init(viewModel: HomeViewModel, note: Note) {
         self.viewModel = viewModel
@@ -38,8 +44,36 @@ struct NoteDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                pinToggle
+                actionsMenu
             }
+        }
+        .navigationDestination(isPresented: $editRequested) {
+            NoteEditorView(
+                noteService: viewModel.noteService,
+                note: detail,
+                onSaved: { saved in
+                    detail = saved
+                    viewModel.noteSaved(saved)
+                }
+            )
+        }
+        .confirmationDialog(
+            "Delete this note?",
+            isPresented: $confirmDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Note", role: .destructive) {
+                Task { await deleteNote() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("The note moves to the recycle bin.")
+        }
+        .alert("Couldn't delete note", isPresented: $showDeleteError) {
+            Button("Retry") { Task { await deleteNote() } }
+            Button("OK", role: .cancel) { deleteError = nil }
+        } message: {
+            Text(deleteError ?? "")
         }
         .alert("Couldn't load note", isPresented: $showError) {
             Button("OK", role: .cancel) { loadError = nil }
@@ -56,10 +90,7 @@ struct NoteDetailView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         } else {
-            Text(detail.content)
-                .font(.body)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            MarkdownContentView(markdown: detail.content)
         }
 
         if !detail.tags.isEmpty {
@@ -98,17 +129,45 @@ struct NoteDetailView: View {
         }
     }
 
-    private var pinToggle: some View {
-        Button {
-            Task { await viewModel.togglePin(id: detail.id, isPinned: detail.isPinned) }
-            detail.isTop.toggle()
-        } label: {
-            Label(
-                detail.isPinned ? "Unpin" : "Pin",
-                systemImage: detail.isPinned ? "pin.slash.fill" : "pin"
-            )
+    /// Edit is the primary affordance, so it sits directly in the bar; pin
+    /// and delete live behind the ellipsis. Delete is `.destructive` and
+    /// still confirms before calling the server.
+    private var actionsMenu: some View {
+        HStack(spacing: 4) {
+            Button {
+                editRequested = true
+            } label: {
+                Label("Edit", systemImage: "square.and.pencil")
+            }
+            .disabled(isDeleting)
+            .accessibilityLabel("Edit note")
+
+            Menu {
+                Button {
+                    Task { await viewModel.togglePin(id: detail.id, isPinned: detail.isPinned) }
+                    detail.isTop.toggle()
+                } label: {
+                    Label(
+                        detail.isPinned ? "Unpin" : "Pin",
+                        systemImage: detail.isPinned ? "pin.slash.fill" : "pin"
+                    )
+                }
+
+                Button(role: .destructive) {
+                    confirmDelete = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            } label: {
+                if isDeleting {
+                    ProgressView()
+                } else {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+            .disabled(isDeleting)
+            .accessibilityLabel("Note actions")
         }
-        .accessibilityLabel(detail.isPinned ? "Unpin note" : "Pin note")
     }
 
     private var loadingShimmer: some View {
@@ -134,6 +193,20 @@ struct NoteDetailView: View {
             showError = true
         }
     }
+
+    /// Soft-deletes the note. On success the view model pops this screen and
+    /// removes the row; on failure the note stays put and the error alert
+    /// offers Retry — the user never loses the note to a half-failed delete.
+    private func deleteNote() async {
+        isDeleting = true
+        defer { isDeleting = false }
+        do {
+            try await viewModel.trashFromDetail(id: detail.id)
+        } catch {
+            deleteError = error.localizedDescription
+            showDeleteError = true
+        }
+    }
 }
 
 #if DEBUG
@@ -141,7 +214,7 @@ struct NoteDetailView: View {
     let base = Date(timeIntervalSince1970: 1_725_000_000)
     let note = Note(
         id: 1,
-        content: "# Quarter plan\n\nShip the notes list before the freeze.\n\nDetails follow here.",
+        content: "# Quarter plan\n\nShip the notes list before the freeze.\n\n- Editor\n- Markdown\n\nDetails follow here.",
         type: .note,
         isTop: true,
         createdAt: base,
@@ -151,7 +224,7 @@ struct NoteDetailView: View {
         ]
     )
     return NavigationStack {
-        NoteDetailView(viewModel: HomeViewModel(noteService: MockNoteService()), note: note)
+        NoteDetailView(viewModel: HomeViewModel(noteService: MockNoteService(notes: [note])), note: note)
     }
 }
 #endif
