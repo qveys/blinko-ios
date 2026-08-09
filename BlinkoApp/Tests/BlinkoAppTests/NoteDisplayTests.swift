@@ -98,8 +98,8 @@ final class NoteDisplayTests: XCTestCase {
         let base = Date()
         let with = Note(
             id: 1, content: "x",
-            attachments: [Attachment(id: 1, name: "a", path: "/p", size: 1, type: "image/png", createdAt: base, updatedAt: base)],
-            createdAt: base, updatedAt: base
+            createdAt: base, updatedAt: base,
+            attachments: [Attachment(id: 1, name: "a", path: "/p", size: 1, type: "image/png", createdAt: base, updatedAt: base)]
         )
         XCTAssertTrue(with.hasAttachments)
     }

@@ -13,6 +13,11 @@ import SwiftUI
 ///
 /// A 401 failure sets `requiresReauthentication`; the alert offers a
 /// "Sign In Again" button that the coordinator consumes via the binding.
+///
+/// Does not own its own `NavigationStack`: `MainTabView` wraps each tab
+/// destination in one, and nesting a second stack would double the nav bar
+/// and leave `.navigationDestination` bound to the inner stack instead of
+/// the tab's. The detail and compose routes bind to the outer stack.
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
 
@@ -21,33 +26,31 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.notes.isEmpty {
-                    loadingState
-                } else if viewModel.notes.isEmpty, viewModel.showError {
-                    errorState
-                } else if viewModel.notes.isEmpty {
-                    emptyState
-                } else {
-                    notesList
+        Group {
+            if viewModel.isLoading && viewModel.notes.isEmpty {
+                loadingState
+            } else if viewModel.notes.isEmpty, viewModel.showError {
+                errorState
+            } else if viewModel.notes.isEmpty {
+                emptyState
+            } else {
+                notesList
+            }
+        }
+        .navigationTitle("Blinko")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: viewModel.composeNote) {
+                    Image(systemName: "square.and.pencil")
                 }
+                .accessibilityLabel("New note")
             }
-            .navigationTitle("Blinko")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(action: viewModel.composeNote) {
-                        Image(systemName: "square.and.pencil")
-                    }
-                    .accessibilityLabel("New note")
-                }
-            }
-            .navigationDestination(item: $viewModel.selectedNote) { note in
-                NoteDetailView(viewModel: viewModel, note: note)
-            }
-            .navigationDestination(isPresented: $viewModel.composeRequested) {
-                ComposePlaceholderView()
-            }
+        }
+        .navigationDestination(item: $viewModel.selectedNote) { note in
+            NoteDetailView(viewModel: viewModel, note: note)
+        }
+        .navigationDestination(isPresented: $viewModel.composeRequested) {
+            ComposePlaceholderView()
         }
         .task { await viewModel.loadNotes() }
         .alert("Session expired", isPresented: $viewModel.requiresReauthentication) {
