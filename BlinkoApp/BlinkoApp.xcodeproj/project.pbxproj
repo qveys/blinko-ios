@@ -34,6 +34,11 @@
 		A1000019 /* TagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* TagService.swift */; };
 		A100001A /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* ModelDecodingTests.swift */; };
 		A100001B /* SyncMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* SyncMetadataTests.swift */; };
+		A100001C /* BlinkoTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* BlinkoTab.swift */; };
+		A100001D /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001F /* MainTabView.swift */; };
+		A100001E /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* PlaceholderView.swift */; };
+		A100001F /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* SettingsTabView.swift */; };
+		A1000020 /* TabNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* TabNavigationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +71,11 @@
 		A200001B /* TagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagService.swift; sourceTree = "<group>"; };
 		A200001C /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
 		A200001D /* SyncMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataTests.swift; sourceTree = "<group>"; };
+		A200001E /* BlinkoTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlinkoTab.swift; sourceTree = "<group>"; };
+		A200001F /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A2000020 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
+		A2000021 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsTabView.swift; sourceTree = "<group>"; };
+		A2000022 /* TabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabNavigationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +110,7 @@
 			children = (
 				A2000001 /* BlinkoApp.swift */,
 				A2000002 /* AppCoordinator.swift */,
+				A200001E /* BlinkoTab.swift */,
 				A200000F /* ServiceContainer.swift */,
 			);
 			path = App;
@@ -109,7 +120,10 @@
 			isa = PBXGroup;
 			children = (
 				A2000003 /* RootView.swift */,
+				A200001F /* MainTabView.swift */,
 				A2000006 /* OnboardingView.swift */,
+				A2000020 /* PlaceholderView.swift */,
+				A2000021 /* SettingsTabView.swift */,
 				A4000006 /* Home */,
 			);
 			path = Views;
@@ -175,6 +189,7 @@
 				A200000C /* HomeViewModelTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
 				A200001D /* SyncMetadataTests.swift */,
+				A2000022 /* TabNavigationTests.swift */,
 			);
 			path = Tests/BlinkoAppTests;
 			sourceTree = SOURCE_ROOT;
@@ -303,6 +318,7 @@
 				A1000007 /* HomeViewModel.swift in Sources */,
 				A1000008 /* Note.swift in Sources */,
 				A100000D /* ServiceContainer.swift in Sources */,
+				A100001C /* BlinkoTab.swift in Sources */,
 				A100000E /* Attachment.swift in Sources */,
 				A100000F /* SyncMetadata.swift in Sources */,
 				A1000010 /* Tag.swift in Sources */,
@@ -314,8 +330,11 @@
 				A1000016 /* NoteDTOs.swift in Sources */,
 				A100000A /* HTTPClient.swift in Sources */,
 				A1000017 /* APIFixtures.swift in Sources */,
+				A100001D /* MainTabView.swift in Sources */,
 				A1000018 /* MockServices.swift in Sources */,
 				A1000009 /* NoteService.swift in Sources */,
+				A100001E /* PlaceholderView.swift in Sources */,
+				A100001F /* SettingsTabView.swift in Sources */,
 				A1000019 /* TagService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -327,6 +346,7 @@
 				A100000C /* HomeViewModelTests.swift in Sources */,
 				A100001A /* ModelDecodingTests.swift in Sources */,
 				A100001B /* SyncMetadataTests.swift in Sources */,
+				A1000020 /* TabNavigationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
