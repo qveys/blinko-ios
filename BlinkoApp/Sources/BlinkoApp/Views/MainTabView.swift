@@ -25,6 +25,9 @@ struct MainTabView: View {
                     .tag(tab)
             }
         }
+        // Attachment views at any depth resolve the authenticated loader from
+        // the environment instead of threading it through initializers.
+        .environment(\.attachmentLoader, services.attachmentLoader)
     }
 
     @ViewBuilder
