@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 @MainActor
-final class HomeViewModel: ObservableObject {
+final class HomeViewModel: ObservableObject, NoteDetailHosting {
     @Published private(set) var notes: [Note] = []
     @Published private(set) var isLoading = false
     @Published private(set) var isLoadingMore = false
