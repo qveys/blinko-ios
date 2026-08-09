@@ -6,6 +6,13 @@ import Security
 /// Uses a `kSecClassGenericPassword` item keyed by `service` + `account`.
 /// All Keychain calls are synchronous and run on the actor's executor, so the
 /// actor wrapper satisfies `Sendable` without additional locking.
+///
+/// `kSecUseDataProtectionKeychain` is set on every call so the item lives in
+/// the data-protection keychain rather than the file-based one. On the
+/// simulator the file-based keychain silently partitions items by access group
+/// (defaulting to an empty group when none is set), which makes writes appear
+/// to succeed while reads return nothing — the data-protection keychain has a
+/// single shared partition and round-trips reliably in tests.
 actor KeychainTokenStore: TokenStore {
     private let service: String
     private let account: String
@@ -20,6 +27,7 @@ actor KeychainTokenStore: TokenStore {
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
             kSecAttrAccount: account,
+            kSecUseDataProtectionKeychain: true,
             kSecReturnData: true,
             kSecMatchLimit: kSecMatchLimitOne,
         ]
@@ -47,6 +55,7 @@ actor KeychainTokenStore: TokenStore {
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
             kSecAttrAccount: account,
+            kSecUseDataProtectionKeychain: true,
             kSecValueData: data,
             kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
         ]
@@ -58,6 +67,7 @@ actor KeychainTokenStore: TokenStore {
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
             kSecAttrAccount: account,
+            kSecUseDataProtectionKeychain: true,
         ]
         SecItemDelete(query as CFDictionary)
     }
