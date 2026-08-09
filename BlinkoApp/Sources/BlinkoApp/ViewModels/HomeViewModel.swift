@@ -110,7 +110,7 @@ final class HomeViewModel: ObservableObject {
         guard let index = notes.firstIndex(where: { $0.id == id }) else { return }
         notes[index].isTop.toggle()
         do {
-            try await noteService.setTop(id: id, isTop: notes[index].isTop)
+            _ = try await noteService.setTop(id: id, isTop: notes[index].isTop)
         } catch {
             notes[index].isTop = isPinned
             present(error)

@@ -150,7 +150,7 @@ struct NoteDetailView: View {
             TagRelation(noteId: 1, tagId: 7, tag: Tag(id: 7, name: "projects", parent: 3, createdAt: base, updatedAt: base))
         ]
     )
-    NavigationStack {
+    return NavigationStack {
         NoteDetailView(viewModel: HomeViewModel(noteService: MockNoteService()), note: note)
     }
 }
