@@ -5,7 +5,7 @@ import Foundation
 ///
 /// `path` is a server-relative path (e.g. `/api/file/foo.png`), not an absolute
 /// URL — resolve it against the configured host with ``url(relativeTo:)``.
-struct Attachment: Identifiable, Codable, Sendable, Equatable {
+struct Attachment: Identifiable, Codable, Sendable, Equatable, Hashable {
     let id: Int
     var name: String
     var path: String

@@ -55,7 +55,7 @@ struct Tag: Identifiable, Codable, Sendable, Equatable, Hashable {
 ///
 /// The server returns the join row with the full `tag` nested inside, so this
 /// exists to unwrap that one level. Prefer `Note.tags` over reading it directly.
-struct TagRelation: Codable, Sendable, Equatable {
+struct TagRelation: Codable, Sendable, Equatable, Hashable {
     let noteId: Int
     let tagId: Int
     let tag: Tag

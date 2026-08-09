@@ -39,6 +39,17 @@
 		A100001E /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* PlaceholderView.swift */; };
 		A100001F /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* SettingsTabView.swift */; };
 		A1000020 /* TabNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* TabNavigationTests.swift */; };
+		A1000021 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* KeychainTokenStore.swift */; };
+		A1000022 /* Note+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* Note+Display.swift */; };
+		A1000023 /* Tag+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000025 /* Tag+Display.swift */; };
+		A1000024 /* NoteTagChipRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026 /* NoteTagChipRow.swift */; };
+		A1000025 /* NoteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* NoteDetailView.swift */; };
+		A1000026 /* ComposePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* ComposePlaceholderView.swift */; };
+		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
+		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
+		A1000029 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* HTTPClientTests.swift */; };
+		A100002A /* NoteDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002C /* NoteDisplayTests.swift */; };
+		A100002B /* HomeViewModelNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002D /* HomeViewModelNavigationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +87,17 @@
 		A2000020 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		A2000021 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsTabView.swift; sourceTree = "<group>"; };
 		A2000022 /* TabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabNavigationTests.swift; sourceTree = "<group>"; };
+		A2000023 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
+		A2000024 /* Note+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Note+Display.swift"; sourceTree = "<group>"; };
+		A2000025 /* Tag+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tag+Display.swift"; sourceTree = "<group>"; };
+		A2000026 /* NoteTagChipRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTagChipRow.swift; sourceTree = "<group>"; };
+		A2000027 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
+		A2000028 /* ComposePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePlaceholderView.swift; sourceTree = "<group>"; };
+		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
+		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
+		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
+		A200002C /* NoteDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDisplayTests.swift; sourceTree = "<group>"; };
+		A200002D /* HomeViewModelNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelNavigationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +147,8 @@
 				A2000020 /* PlaceholderView.swift */,
 				A2000021 /* SettingsTabView.swift */,
 				A4000006 /* Home */,
+				A400000C /* NoteDetail */,
+				A400000D /* Compose */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -142,8 +166,10 @@
 			children = (
 				A2000010 /* Attachment.swift */,
 				A2000008 /* Note.swift */,
+				A2000024 /* Note+Display.swift */,
 				A2000011 /* SyncMetadata.swift */,
 				A2000012 /* Tag.swift */,
+				A2000025 /* Tag+Display.swift */,
 				A2000013 /* User.swift */,
 			);
 			path = Models;
@@ -154,8 +180,25 @@
 			children = (
 				A2000004 /* HomeView.swift */,
 				A2000005 /* NoteRowView.swift */,
+				A2000026 /* NoteTagChipRow.swift */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		A400000C /* NoteDetail */ = {
+			isa = PBXGroup;
+			children = (
+				A2000027 /* NoteDetailView.swift */,
+			);
+			path = NoteDetail;
+			sourceTree = "<group>";
+		};
+		A400000D /* Compose */ = {
+			isa = PBXGroup;
+			children = (
+				A2000028 /* ComposePlaceholderView.swift */,
+			);
+			path = Compose;
 			sourceTree = "<group>";
 		};
 		A4000007 /* Services */ = {
@@ -167,6 +210,7 @@
 				A2000017 /* AuthDTOs.swift */,
 				A2000018 /* NoteDTOs.swift */,
 				A200000A /* HTTPClient.swift */,
+				A2000023 /* KeychainTokenStore.swift */,
 				A2000019 /* APIFixtures.swift */,
 				A200001A /* MockServices.swift */,
 				A2000009 /* NoteService.swift */,
@@ -187,9 +231,14 @@
 			isa = PBXGroup;
 			children = (
 				A200000C /* HomeViewModelTests.swift */,
+				A200002D /* HomeViewModelNavigationTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
 				A200001D /* SyncMetadataTests.swift */,
 				A2000022 /* TabNavigationTests.swift */,
+				A2000029 /* KeychainTokenStoreTests.swift */,
+				A200002A /* AppCoordinatorTests.swift */,
+				A200002B /* HTTPClientTests.swift */,
+				A200002C /* NoteDisplayTests.swift */,
 			);
 			path = Tests/BlinkoAppTests;
 			sourceTree = SOURCE_ROOT;
@@ -336,6 +385,12 @@
 				A100001E /* PlaceholderView.swift in Sources */,
 				A100001F /* SettingsTabView.swift in Sources */,
 				A1000019 /* TagService.swift in Sources */,
+				A1000021 /* KeychainTokenStore.swift in Sources */,
+				A1000022 /* Note+Display.swift in Sources */,
+				A1000023 /* Tag+Display.swift in Sources */,
+				A1000024 /* NoteTagChipRow.swift in Sources */,
+				A1000025 /* NoteDetailView.swift in Sources */,
+				A1000026 /* ComposePlaceholderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,6 +402,11 @@
 				A100001A /* ModelDecodingTests.swift in Sources */,
 				A100001B /* SyncMetadataTests.swift in Sources */,
 				A1000020 /* TabNavigationTests.swift in Sources */,
+				A1000027 /* KeychainTokenStoreTests.swift in Sources */,
+				A1000028 /* AppCoordinatorTests.swift in Sources */,
+				A1000029 /* HTTPClientTests.swift in Sources */,
+				A100002A /* NoteDisplayTests.swift in Sources */,
+				A100002B /* HomeViewModelNavigationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

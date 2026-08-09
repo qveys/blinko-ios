@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /// Wires the networking stack to the services that use it.
@@ -10,14 +11,13 @@ final class ServiceContainer: ObservableObject {
     /// Origin of the Blinko instance, e.g. `https://blinko.example.com`.
     let serverURL: URL
 
-    let tokenStore: InMemoryTokenStore
+    let tokenStore: any TokenStore
     let noteService: any NoteServiceProtocol
     let tagService: any TagServiceProtocol
     let authService: any AuthServiceProtocol
 
-    init(serverURL: URL, session: URLSession = .shared, token: String? = nil) {
+    init(serverURL: URL, session: URLSession = .shared, tokenStore: any TokenStore = KeychainTokenStore()) {
         self.serverURL = serverURL
-        let tokenStore = InMemoryTokenStore(token: token)
         self.tokenStore = tokenStore
 
         let httpClient = URLSessionHTTPClient(
@@ -33,7 +33,7 @@ final class ServiceContainer: ObservableObject {
     /// Container built from explicit services, for previews and tests.
     init(
         serverURL: URL,
-        tokenStore: InMemoryTokenStore,
+        tokenStore: any TokenStore,
         noteService: any NoteServiceProtocol,
         tagService: any TagServiceProtocol,
         authService: any AuthServiceProtocol

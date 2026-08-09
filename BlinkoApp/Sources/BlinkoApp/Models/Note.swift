@@ -19,7 +19,7 @@ enum NoteType: Int, Codable, Sendable, CaseIterable {
 ///
 /// Field names mirror `model notes` in Blinko's `prisma/schema.prisma` so the
 /// default `CodingKeys` decode the wire format directly.
-struct Note: Identifiable, Codable, Sendable, Equatable {
+struct Note: Identifiable, Codable, Sendable, Equatable, Hashable {
     let id: Int
     var content: String
     var type: NoteType

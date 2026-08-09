@@ -49,8 +49,14 @@ protocol TokenProviding: Sendable {
     var token: String? { get async }
 }
 
-/// In-memory token holder. Real persistence lands with the auth ticket.
-actor InMemoryTokenStore: TokenProviding {
+/// Read-write token storage. `AuthService` writes through this; `URLSessionHTTPClient`
+/// reads through the narrower `TokenProviding` protocol.
+protocol TokenStore: TokenProviding {
+    func setToken(_ token: String?) async
+}
+
+/// In-memory token holder. Real persistence lives in ``KeychainTokenStore``.
+actor InMemoryTokenStore: TokenStore {
     private var storedToken: String?
 
     init(token: String? = nil) {

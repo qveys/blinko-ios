@@ -80,16 +80,26 @@ if best and best[3]:
 }
 
 # Route xcodebuild output through xcpretty when available, but never let a
-# missing formatter (or its exit status) mask a real build failure.
+# missing formatter (or its exit status) mask a real build failure. On
+# failure, dump the tail of the raw log: xcpretty swallows non-standard
+# diagnostics (xcodebuild: error:, "The following build commands failed:"),
+# and the uploaded artifact is not always reachable from where we debug.
 run_xcodebuild() {
   mkdir -p "${RESULTS_DIR}"
   local logfile="${RESULTS_DIR}/${1:?log name required}.log"
   shift
 
   set -o pipefail
+  local status=0
   if command -v xcpretty >/dev/null 2>&1; then
-    xcodebuild "$@" 2>&1 | tee "${logfile}" | xcpretty
+    xcodebuild "$@" 2>&1 | tee "${logfile}" | xcpretty || status=$?
   else
-    xcodebuild "$@" 2>&1 | tee "${logfile}"
+    xcodebuild "$@" 2>&1 | tee "${logfile}" || status=$?
   fi
+
+  if (( status != 0 )); then
+    err "xcodebuild exited with status ${status}; last 120 lines of raw log:"
+    tail -n 120 "${logfile}" >&2
+  fi
+  return "${status}"
 }
