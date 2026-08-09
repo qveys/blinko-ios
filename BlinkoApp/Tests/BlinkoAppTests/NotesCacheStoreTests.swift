@@ -22,8 +22,12 @@ final class NotesCacheStoreTests: XCTestCase {
         FileNotesCacheStore(serverURL: server, directory: directory)
     }
 
+    /// Whole-second dates: the cache encodes timestamps as ISO 8601 without
+    /// fractional seconds, so a `Date()` with sub-second precision would not
+    /// round-trip `Equatable`-identical.
     private func note(id: Int, content: String = "cached") -> Note {
-        Note(id: id, content: content, createdAt: Date(), updatedAt: Date())
+        let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
+        return Note(id: id, content: content, createdAt: timestamp, updatedAt: timestamp)
     }
 
     // MARK: - Persistence
