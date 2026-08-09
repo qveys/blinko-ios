@@ -33,6 +33,7 @@ actor KeychainTokenStore: TokenStore {
         ]
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
+        lastReadStatus = status
         KeychainTokenStore.log("read", status: status)
         guard status == errSecSuccess,
               let data = result as? Data,
@@ -61,6 +62,7 @@ actor KeychainTokenStore: TokenStore {
             kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
         ]
         let status = SecItemAdd(attributes as CFDictionary, nil)
+        lastAddStatus = status
         KeychainTokenStore.log("add", status: status)
     }
 
@@ -72,14 +74,26 @@ actor KeychainTokenStore: TokenStore {
             kSecUseDataProtectionKeychain: true,
         ]
         let status = SecItemDelete(query as CFDictionary)
+        lastDeleteStatus = status
         KeychainTokenStore.log("delete", status: status)
     }
 
-    /// Prints the SecItem OSStatus for each operation. Diagnostic only — the
+    /// Records the SecItem OSStatus for each operation. Diagnostic only — the
     /// simulator keychain round-trip is failing with no visible reason, and the
     /// raw status code (errSecMissingEntitlement -34018, errSecParam, etc.)
     /// tells us which. Stripped once green.
     private static func log(_ op: String, status: OSStatus) {
-        print("[KeychainTokenStore] \(op) status=\(status)")
+        let message = "KeychainTokenStore \(op) status=\(status)"
+        NSLog("%@", message)
+        FileHandle.standardError.write(Data((message + "\n").utf8))
     }
+
+    #if DEBUG
+    /// Last OSStatus from SecItemAdd / SecItemCopyMatching / SecItemDelete.
+    /// Diagnostic hook so tests can surface the real failure code instead of a
+    /// bare `nil != Optional("...")`.
+    private(set) var lastAddStatus: OSStatus = 0
+    private(set) var lastReadStatus: OSStatus = 0
+    private(set) var lastDeleteStatus: OSStatus = 0
+    #endif
 }

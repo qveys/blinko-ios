@@ -20,15 +20,19 @@ final class KeychainTokenStoreTests: XCTestCase {
 
     func testSaveAndLoad() async throws {
         await store.setToken("tok_abc123")
+        let addStatus = await store.lastAddStatus
         let loaded = await store.token
-        XCTAssertEqual(loaded, "tok_abc123")
+        let readStatus = await store.lastReadStatus
+        XCTAssertEqual(loaded, "tok_abc123", "add=\(addStatus) read=\(readStatus)")
     }
 
     func testOverwrite() async throws {
         await store.setToken("first")
         await store.setToken("second")
+        let addStatus = await store.lastAddStatus
         let loaded = await store.token
-        XCTAssertEqual(loaded, "second")
+        let readStatus = await store.lastReadStatus
+        XCTAssertEqual(loaded, "second", "add=\(addStatus) read=\(readStatus)")
     }
 
     func testClear() async throws {
