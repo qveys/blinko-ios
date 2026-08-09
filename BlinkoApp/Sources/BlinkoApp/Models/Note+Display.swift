@@ -29,12 +29,13 @@ extension Note {
         content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    /// The first non-empty line of the content, before any heading stripping.
+    /// The first non-blank line of the content, trimmed, before any heading
+    /// stripping. A line of only whitespace is not a title.
     private var firstLine: String? {
         content
             .split(omittingEmptySubsequences: true, whereSeparator: { $0.isNewline })
-            .map(String.init)
-            .first
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .first { !$0.isEmpty }
     }
 
     /// Removes leading `#` ATX heading markers and the space after them.
