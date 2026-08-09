@@ -93,6 +93,8 @@ enum APIError: Error, Equatable, Sendable {
     case transport(String)
     /// The request was cancelled.
     case cancelled
+    /// The server stopped sending data mid-transfer (stall timeout).
+    case timedOut
 
     /// Whether retrying the identical request could plausibly succeed.
     ///
@@ -101,7 +103,7 @@ enum APIError: Error, Equatable, Sendable {
     /// transient database and AI-provider failures as `INTERNAL_SERVER_ERROR`.
     var isRetryable: Bool {
         switch self {
-        case .transport:
+        case .transport, .timedOut:
             return true
         case .server(let statusCode, _, _):
             return statusCode == 408 || statusCode == 429 || (500..<600).contains(statusCode)
@@ -155,6 +157,8 @@ extension APIError: LocalizedError {
             return "Couldn't reach the server. Check your connection."
         case .cancelled:
             return "The request was cancelled."
+        case .timedOut:
+            return "The server stopped responding. Check your connection."
         }
     }
 }
