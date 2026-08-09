@@ -50,6 +50,9 @@
 		A100002E /* NoteEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* NoteEditorViewModel.swift */; };
 		A100002F /* NoteEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* NoteEditorViewModelTests.swift */; };
 		A1000030 /* MarkdownBlockParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* MarkdownBlockParserTests.swift */; };
+		A1000031 /* AttachmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* AttachmentService.swift */; };
+		A1000032 /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* MultipartFormData.swift */; };
+		A1000033 /* AttachmentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000035 /* AttachmentServiceTests.swift */; };
 		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
 		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
 		A1000029 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* HTTPClientTests.swift */; };
@@ -103,6 +106,9 @@
 		A2000030 /* NoteEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModel.swift; sourceTree = "<group>"; };
 		A2000031 /* NoteEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModelTests.swift; sourceTree = "<group>"; };
 		A2000032 /* MarkdownBlockParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockParserTests.swift; sourceTree = "<group>"; };
+		A2000033 /* AttachmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentService.swift; sourceTree = "<group>"; };
+		A2000034 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
+		A2000035 /* AttachmentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentServiceTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
@@ -218,12 +224,14 @@
 			isa = PBXGroup;
 			children = (
 				A2000014 /* APIError.swift */,
+				A2000033 /* AttachmentService.swift */,
 				A2000015 /* AuthService.swift */,
 				A2000016 /* BlinkoAPI.swift */,
 				A2000017 /* AuthDTOs.swift */,
 				A2000018 /* NoteDTOs.swift */,
 				A200000A /* HTTPClient.swift */,
 				A2000023 /* KeychainTokenStore.swift */,
+				A2000034 /* MultipartFormData.swift */,
 				A2000019 /* APIFixtures.swift */,
 				A200001A /* MockServices.swift */,
 				A2000009 /* NoteService.swift */,
@@ -247,6 +255,7 @@
 				A200002D /* HomeViewModelNavigationTests.swift */,
 				A2000031 /* NoteEditorViewModelTests.swift */,
 				A2000032 /* MarkdownBlockParserTests.swift */,
+				A2000035 /* AttachmentServiceTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
 				A200001D /* SyncMetadataTests.swift */,
 				A2000022 /* TabNavigationTests.swift */,
@@ -388,7 +397,9 @@
 				A1000010 /* Tag.swift in Sources */,
 				A1000011 /* User.swift in Sources */,
 				A1000012 /* APIError.swift in Sources */,
+				A1000031 /* AttachmentService.swift in Sources */,
 				A1000013 /* AuthService.swift in Sources */,
+				A1000032 /* MultipartFormData.swift in Sources */,
 				A1000014 /* BlinkoAPI.swift in Sources */,
 				A1000015 /* AuthDTOs.swift in Sources */,
 				A1000016 /* NoteDTOs.swift in Sources */,
@@ -423,6 +434,7 @@
 				A1000027 /* KeychainTokenStoreTests.swift in Sources */,
 				A1000028 /* AppCoordinatorTests.swift in Sources */,
 				A1000029 /* HTTPClientTests.swift in Sources */,
+				A1000033 /* AttachmentServiceTests.swift in Sources */,
 				A100002A /* NoteDisplayTests.swift in Sources */,
 				A100002B /* HomeViewModelNavigationTests.swift in Sources */,
 				A100002F /* NoteEditorViewModelTests.swift in Sources */,

@@ -131,14 +131,34 @@ final class ModelDecodingTests: XCTestCase {
         )
     }
 
-    /// The upload route capitalizes `Message` and omits `name`.
+    /// The upload route capitalizes `Message` and spreads the storage layer's
+    /// `{filePath, fileName}` into the response.
     func testDecodesAttachmentUploadResponse() throws {
         let upload = try decode(AttachmentUploadResponse.self, APIFixtures.attachmentUploadResponse)
 
         XCTAssertEqual(upload.message, "Success")
         XCTAssertEqual(upload.size, 20_480)
-        // Derived client-side from the path, since the server sends no name.
+        XCTAssertEqual(upload.path, "/api/file/1714746000-offsite.png")
         XCTAssertEqual(upload.name, "1714746000-offsite.png")
+    }
+
+    /// Older servers sent `path` and no name key; the name is then derived
+    /// client-side from the path's last component.
+    func testDecodesLegacyAttachmentUploadResponse() throws {
+        let upload = try decode(AttachmentUploadResponse.self, APIFixtures.attachmentUploadResponseLegacy)
+
+        XCTAssertEqual(upload.path, "/api/file/1714746000-offsite.png")
+        XCTAssertEqual(upload.name, "1714746000-offsite.png")
+    }
+
+    /// An upload response with neither `filePath` nor `path` is unusable.
+    func testAttachmentUploadResponseRequiresAPath() {
+        let json = """
+        { "Message": "Success", "status": 200, "type": "image/png", "size": 1 }
+        """
+        XCTAssertThrowsError(
+            try JSONDecoder.blinko.decode(AttachmentUploadResponse.self, from: Data(json.utf8))
+        )
     }
 
     // MARK: - Auth

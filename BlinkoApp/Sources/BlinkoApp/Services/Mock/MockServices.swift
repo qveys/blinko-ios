@@ -239,3 +239,38 @@ actor MockAuthService: AuthServiceProtocol {
 
     func logout() async {}
 }
+
+/// In-memory `AttachmentServiceProtocol`.
+///
+/// Echoes the upload back the way the server would: a timestamped,
+/// space-collapsed stored name under `/api/file/`. Seed `error` to exercise
+/// failure paths.
+actor MockAttachmentService: AttachmentServiceProtocol {
+    private let error: (any Error)?
+    /// Every upload accepted so far, for asserting in tests.
+    private(set) var uploads: [(filename: String, mimeType: String, byteCount: Int)] = []
+
+    init(error: (any Error)? = nil) {
+        self.error = error
+    }
+
+    /// Always fails, for testing error states.
+    static func failing(_ error: any Error = APIError.unauthorized(message: nil)) -> MockAttachmentService {
+        MockAttachmentService(error: error)
+    }
+
+    func upload(data: Data, filename: String, mimeType: String) async throws -> AttachmentUploadResponse {
+        if let error { throw error }
+        uploads.append((filename, mimeType, data.count))
+        // Mirror the server's renaming: spaces collapse to underscores and a
+        // timestamp prefix is added on collision; the prefix alone is enough
+        // for previews.
+        let storedName = "1714746000-" + filename.replacingOccurrences(of: " ", with: "_")
+        return AttachmentUploadResponse(
+            path: "/api/file/\(storedName)",
+            type: mimeType,
+            size: Int64(data.count),
+            name: storedName
+        )
+    }
+}
