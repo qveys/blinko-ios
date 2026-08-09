@@ -31,7 +31,7 @@ struct MainTabView: View {
     private func destination(for tab: BlinkoTab) -> some View {
         switch tab {
         case .home:
-            HomeView(noteService: services.noteService)
+            NavigationStack { HomeView(noteService: services.noteService) }
         case .notes:
             NavigationStack { PlaceholderView(title: tab.title, systemImage: tab.systemImage) }
         case .search:
