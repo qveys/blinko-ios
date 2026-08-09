@@ -1,8 +1,10 @@
 # CI/CD
 
-Automated build and test validation for the Blinko iOS client.
+Automated build, test, and repository governance for the Blinko iOS client.
 
-## Pipeline
+## Pipelines
+
+### Build and test
 
 `.github/workflows/ios-ci.yml` runs on every pull request to `main`, every push
 to `main`, and on manual dispatch.
@@ -16,6 +18,28 @@ to `main`, and on manual dispatch.
 
 The job name is what appears in PR checks and is the string branch protection
 needs — see [Branch protection](#branch-protection) below.
+
+### Repository governance
+
+| Workflow | File | Trigger | Purpose |
+|---|---|---|---|
+| **Triage** | `triage.yml` | PR open/edit/sync; issue open/edit; `/triage` comment | Auto-label by path (`labeler.yml`), normalize titles to conventional-commit style |
+| **Sync Labels** | `sync-labels.yml` | Push to `main` touching `labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
+| **Stale** | `stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
+
+Labels are defined in `.github/labels.yml` (source of truth). Path → area mapping
+lives in `.github/labeler.yml`. Type / Priority / Effort labels stay manual
+(`sync-labels: false` on the labeler step).
+
+Issue forms live under `.github/ISSUE_TEMPLATE/` (bug report, feature request).
+Dependabot (`.github/dependabot.yml`) bumps GitHub Actions weekly and will open
+Swift Package Manager updates under `BlinkoApp/` once remote deps exist.
+
+**Not ported** from other repos on purpose:
+
+- **Release packaging** — no App Store / TestFlight automation yet (see [Release automation](#release-automation-fastlane)).
+- **npm audit / Node test** — this is a Swift/Xcode project; security surface is different.
+- **GitHub Pages** — no privacy/support static site in this repo.
 
 ## Local equivalents
 

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Blinko (server / product)
+    url: https://github.com/blinkospace/blinko
+    about: Server bugs, API changes, and product questions belong in the upstream Blinko project.

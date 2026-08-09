@@ -1,0 +1,59 @@
+name: 🐞 Bug report
+description: Report something that does not behave as expected in the iOS client.
+labels:
+  - "🐞 Type: Bug"
+body:
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - iPhone
+        - iPad
+        - Simulator
+        - Other (please specify in description)
+    validations:
+      required: true
+  - type: input
+    id: ios-version
+    attributes:
+      label: iOS version
+      placeholder: "e.g. iOS 18.2"
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App version / commit
+      description: App Store version, TestFlight build, or git SHA if building from source.
+      placeholder: "e.g. 0.1.0 (42) or abc1234"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the app and complete onboarding against server X
+        2. Pull to refresh the note list
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / crash info
+      description: Relevant Console.app lines, Xcode console output, or crash report excerpts.
+      render: shell
