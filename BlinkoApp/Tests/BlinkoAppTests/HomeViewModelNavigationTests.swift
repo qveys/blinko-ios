@@ -100,6 +100,65 @@ final class HomeViewModelNavigationTests: XCTestCase {
         XCTAssertEqual(viewModel.notes.first?.isPinned, before)
     }
 
+    // MARK: - Editor → list sync (BLI-20)
+
+    func testNoteSavedPrependsCreatedNote() async {
+        let existing = Self.sampleNote(id: 1)
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: [existing]))
+        await viewModel.loadNotes()
+
+        viewModel.noteSaved(Self.sampleNote(id: 2))
+
+        XCTAssertEqual(viewModel.notes.map(\.id), [2, 1])
+    }
+
+    func testNoteSavedUpdatesEditedNoteInPlace() async {
+        let notes = [Self.sampleNote(id: 1), Self.sampleNote(id: 2)]
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: notes))
+        await viewModel.loadNotes()
+
+        let originalOrder = viewModel.notes.map(\.id)
+        var edited = viewModel.notes[1]
+        edited.content = "edited content"
+        viewModel.noteSaved(edited)
+
+        // In-place update: same rows, same order, new content.
+        XCTAssertEqual(viewModel.notes.map(\.id), originalOrder)
+        XCTAssertEqual(viewModel.notes.first(where: { $0.id == edited.id })?.content, "edited content")
+    }
+
+    // MARK: - Delete from detail (BLI-20)
+
+    func testTrashFromDetailRemovesRowAndDismisses() async throws {
+        let note = Self.sampleNote(id: 1)
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: [note]))
+        await viewModel.loadNotes()
+        viewModel.open(note)
+
+        try await viewModel.trashFromDetail(id: 1)
+
+        XCTAssertTrue(viewModel.notes.isEmpty)
+        XCTAssertNil(viewModel.selectedNote)
+    }
+
+    func testTrashFromDetailRethrowsAndKeepsRowOnFailure() async {
+        let note = Self.sampleNote(id: 1)
+        let service = MockNoteService(notes: [note], writeError: APIError.transport("offline"))
+        let viewModel = HomeViewModel(noteService: service)
+        await viewModel.loadNotes()
+        viewModel.open(note)
+
+        do {
+            try await viewModel.trashFromDetail(id: 1)
+            XCTFail("Expected the write error to propagate")
+        } catch {
+            // expected — the detail view owns the error presentation.
+        }
+
+        XCTAssertEqual(viewModel.notes.map(\.id), [1])
+        XCTAssertEqual(viewModel.selectedNote, note)
+    }
+
     // MARK: - Helpers
 
     private static func sampleNote(id: Int, isTop: Bool = false) -> Note {
