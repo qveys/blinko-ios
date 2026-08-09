@@ -19,6 +19,21 @@
 		A100000A /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000A /* HTTPClient.swift */; };
 		A100000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200000B /* Assets.xcassets */; };
 		A100000C /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000C /* HomeViewModelTests.swift */; };
+		A100000D /* ServiceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000F /* ServiceContainer.swift */; };
+		A100000E /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* Attachment.swift */; };
+		A100000F /* SyncMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* SyncMetadata.swift */; };
+		A1000010 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* Tag.swift */; };
+		A1000011 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* User.swift */; };
+		A1000012 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000014 /* APIError.swift */; };
+		A1000013 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015 /* AuthService.swift */; };
+		A1000014 /* BlinkoAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000016 /* BlinkoAPI.swift */; };
+		A1000015 /* AuthDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* AuthDTOs.swift */; };
+		A1000016 /* NoteDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* NoteDTOs.swift */; };
+		A1000017 /* APIFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* APIFixtures.swift */; };
+		A1000018 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001A /* MockServices.swift */; };
+		A1000019 /* TagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* TagService.swift */; };
+		A100001A /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* ModelDecodingTests.swift */; };
+		A100001B /* SyncMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* SyncMetadataTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +51,21 @@
 		A200000C /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 		A200000D /* BlinkoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlinkoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200000E /* BlinkoAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlinkoAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A200000F /* ServiceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceContainer.swift; sourceTree = "<group>"; };
+		A2000010 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
+		A2000011 /* SyncMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadata.swift; sourceTree = "<group>"; };
+		A2000012 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		A2000013 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		A2000014 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		A2000015 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		A2000016 /* BlinkoAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlinkoAPI.swift; sourceTree = "<group>"; };
+		A2000017 /* AuthDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTO/AuthDTOs.swift; sourceTree = "<group>"; };
+		A2000018 /* NoteDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTO/NoteDTOs.swift; sourceTree = "<group>"; };
+		A2000019 /* APIFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mock/APIFixtures.swift; sourceTree = "<group>"; };
+		A200001A /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mock/MockServices.swift; sourceTree = "<group>"; };
+		A200001B /* TagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagService.swift; sourceTree = "<group>"; };
+		A200001C /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
+		A200001D /* SyncMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +100,7 @@
 			children = (
 				A2000001 /* BlinkoApp.swift */,
 				A2000002 /* AppCoordinator.swift */,
+				A200000F /* ServiceContainer.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -95,7 +126,11 @@
 		A4000005 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A2000010 /* Attachment.swift */,
 				A2000008 /* Note.swift */,
+				A2000011 /* SyncMetadata.swift */,
+				A2000012 /* Tag.swift */,
+				A2000013 /* User.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -112,8 +147,16 @@
 		A4000007 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				A2000009 /* NoteService.swift */,
+				A2000014 /* APIError.swift */,
+				A2000015 /* AuthService.swift */,
+				A2000016 /* BlinkoAPI.swift */,
+				A2000017 /* AuthDTOs.swift */,
+				A2000018 /* NoteDTOs.swift */,
 				A200000A /* HTTPClient.swift */,
+				A2000019 /* APIFixtures.swift */,
+				A200001A /* MockServices.swift */,
+				A2000009 /* NoteService.swift */,
+				A200001B /* TagService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -130,6 +173,8 @@
 			isa = PBXGroup;
 			children = (
 				A200000C /* HomeViewModelTests.swift */,
+				A200001C /* ModelDecodingTests.swift */,
+				A200001D /* SyncMetadataTests.swift */,
 			);
 			path = Tests/BlinkoAppTests;
 			sourceTree = SOURCE_ROOT;
@@ -257,8 +302,21 @@
 				A1000006 /* OnboardingView.swift in Sources */,
 				A1000007 /* HomeViewModel.swift in Sources */,
 				A1000008 /* Note.swift in Sources */,
-				A1000009 /* NoteService.swift in Sources */,
+				A100000D /* ServiceContainer.swift in Sources */,
+				A100000E /* Attachment.swift in Sources */,
+				A100000F /* SyncMetadata.swift in Sources */,
+				A1000010 /* Tag.swift in Sources */,
+				A1000011 /* User.swift in Sources */,
+				A1000012 /* APIError.swift in Sources */,
+				A1000013 /* AuthService.swift in Sources */,
+				A1000014 /* BlinkoAPI.swift in Sources */,
+				A1000015 /* AuthDTOs.swift in Sources */,
+				A1000016 /* NoteDTOs.swift in Sources */,
 				A100000A /* HTTPClient.swift in Sources */,
+				A1000017 /* APIFixtures.swift in Sources */,
+				A1000018 /* MockServices.swift in Sources */,
+				A1000009 /* NoteService.swift in Sources */,
+				A1000019 /* TagService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +325,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000C /* HomeViewModelTests.swift in Sources */,
+				A100001A /* ModelDecodingTests.swift in Sources */,
+				A100001B /* SyncMetadataTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

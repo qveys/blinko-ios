@@ -41,3 +41,6 @@ Carthage/Build/
 # Xcode user-specific settings
 *.xccheckout
 xcuserstate
+
+# Paperclip agent worktrees (local scratch, never source)
+.paperclip/
