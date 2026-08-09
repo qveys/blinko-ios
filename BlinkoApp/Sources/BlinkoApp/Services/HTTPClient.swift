@@ -164,6 +164,8 @@ final class URLSessionHTTPClient: HTTPClient {
             throw APIError.cancelled
         } catch is CancellationError {
             throw APIError.cancelled
+        } catch let error as URLError where error.code == .timedOut {
+            throw APIError.timedOut
         } catch {
             throw APIError.transport(error.localizedDescription)
         }
