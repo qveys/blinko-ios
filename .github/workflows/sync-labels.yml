@@ -1,0 +1,93 @@
+name: Sync Labels
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete_missing:
+        description: "Remove GitHub labels not listed in labels.yml (destructive)"
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/labels.yml"
+      - ".github/workflows/sync-labels.yml"
+
+jobs:
+  sync-labels:
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Sync labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DELETE_EXTRA_LABELS: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.delete_missing }}
+        run: |
+          ruby -ryaml -rjson -ropen3 <<'RUBY'
+          desired = YAML.safe_load(
+            File.read(".github/labels.yml"),
+            permitted_classes: [Hash, Array, String],
+            aliases: false
+          )
+          raise "labels.yml must be an array" unless desired.is_a?(Array)
+
+          # --slurp wraps each paginated page in one outer array so multi-page
+          # label lists remain valid JSON (plain --paginate concatenates arrays).
+          output, status = Open3.capture2(
+            "gh", "api", "repos/#{ENV.fetch("GH_REPO")}/labels",
+            "--paginate", "--slurp"
+          )
+          raise "Unable to fetch current labels" unless status.success?
+
+          pages = JSON.parse(output)
+          current = pages.flatten
+          desired_by_name = desired.each_with_object({}) { |label, acc| acc[label.fetch("name")] = label }
+          current_by_name = current.each_with_object({}) { |label, acc| acc[label.fetch("name")] = label }
+
+          desired.each do |label|
+            name = label.fetch("name")
+            color = label.fetch("color")
+            description = label.fetch("description")
+
+            if current_by_name.key?(name)
+              puts "Updating #{name}"
+              system(
+                "gh", "label", "edit", name,
+                "--repo", ENV.fetch("GH_REPO"),
+                "--color", color,
+                "--description", description
+              ) or raise "Failed to update #{name}"
+            else
+              puts "Creating #{name}"
+              system(
+                "gh", "label", "create", name,
+                "--repo", ENV.fetch("GH_REPO"),
+                "--color", color,
+                "--description", description
+              ) or raise "Failed to create #{name}"
+            end
+          end
+
+          delete_extra = ENV["DELETE_EXTRA_LABELS"].to_s == "true"
+          if delete_extra
+            (current_by_name.keys - desired_by_name.keys).sort.each do |name|
+              puts "Deleting #{name}"
+              system("gh", "label", "delete", name, "--repo", ENV.fetch("GH_REPO"), "--yes") or raise "Failed to delete #{name}"
+            end
+          else
+            extra = current_by_name.keys - desired_by_name.keys
+            if extra.any?
+              puts "Skipping deletion of #{extra.size} extra label(s) (enable delete_missing on workflow_dispatch to remove)."
+            end
+          end
+          RUBY

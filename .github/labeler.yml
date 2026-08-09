@@ -1,0 +1,89 @@
+# Auto-label PRs by changed paths (used by .github/workflows/triage.yml).
+# sync-labels is false in the workflow so Type / Priority / Effort stay manual.
+
+"🧩 Area: App":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/App/**/*"
+          - "BlinkoApp/BlinkoApp.xcodeproj/**/*"
+          - "BlinkoApp/Package.swift"
+
+"🧩 Area: Auth":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Services/AuthService.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Services/DTO/AuthDTOs.swift"
+
+"🧩 Area: CI":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**/*"
+          - "scripts/ci-*.sh"
+          - "scripts/apply-branch-protection.sh"
+
+"🧩 Area: Docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "README.md"
+          - "ROADMAP.md"
+          - "docs/**/*"
+
+"🧩 Area: Models":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Models/**/*"
+
+"🧩 Area: Networking":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Services/HTTPClient.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Services/BlinkoAPI.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Services/APIError.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Services/DTO/**/*"
+
+"🧩 Area: Notes":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Services/NoteService.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Services/DTO/NoteDTOs.swift"
+          - "BlinkoApp/Sources/BlinkoApp/Views/Home/**/*"
+          # Models/Note.swift is covered by Area: Models only (no double-label).
+
+"🧩 Area: Onboarding":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Views/OnboardingView.swift"
+
+"🧩 Area: Services":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Services/**/*"
+
+"🧩 Area: Sync":
+  - changed-files:
+      - any-glob-to-any-file:
+          # Models/SyncMetadata.swift is covered by Area: Models only.
+          - "BlinkoApp/Tests/BlinkoAppTests/SyncMetadataTests.swift"
+
+"🧩 Area: Tags":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Services/TagService.swift"
+          # Models/Tag.swift is covered by Area: Models only.
+
+"🧩 Area: Tests":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Tests/**/*"
+          - "scripts/ci-test.sh"
+
+"🧩 Area: UI":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/Views/**/*"
+          - "BlinkoApp/Resources/**/*"
+
+"🧩 Area: ViewModels":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "BlinkoApp/Sources/BlinkoApp/ViewModels/**/*"

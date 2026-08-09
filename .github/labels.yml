@@ -1,0 +1,233 @@
+# Canonical label definitions
+# Sync with GitHub Actions so labels remain consistent across branches/forks.
+# Keep this list intentionally small and focused on the iOS client's workflow.
+
+# --- Areas (map to code layout under BlinkoApp/) ---
+
+- name: "🧩 Area: App"
+  color: "1d76db"
+  description: "App entry, coordinator, service container, app lifecycle."
+
+- name: "🧩 Area: Auth"
+  color: "1d76db"
+  description: "Authentication, tokens, session, login/onboarding credentials."
+
+- name: "🧩 Area: CI"
+  color: "1d76db"
+  description: "Workflows, actions, scripts, or continuous integration configuration."
+
+- name: "🧩 Area: Docs"
+  color: "1d76db"
+  description: "README, ROADMAP, docs/, and other repo-level documentation."
+
+- name: "🧩 Area: Models"
+  color: "1d76db"
+  description: "Domain models, decoding, SyncMetadata, Note, Tag, User, Attachment."
+
+- name: "🧩 Area: Networking"
+  color: "1d76db"
+  description: "HTTPClient, BlinkoAPI, DTOs, APIError, request/response plumbing."
+
+- name: "🧩 Area: Notes"
+  color: "1d76db"
+  description: "Note list, note detail, NoteService, note-related UI and logic."
+
+- name: "🧩 Area: Onboarding"
+  color: "1d76db"
+  description: "First-run, server setup, OnboardingView and related flow."
+
+- name: "🧩 Area: Services"
+  color: "1d76db"
+  description: "Service layer, mocks, fixtures, non-networking service logic."
+
+- name: "🧩 Area: Sync"
+  color: "1d76db"
+  description: "Sync state, metadata, stall detection, background refresh."
+
+- name: "🧩 Area: Tags"
+  color: "1d76db"
+  description: "Tags model, TagService, tag UI and filtering."
+
+- name: "🧩 Area: Tests"
+  color: "1d76db"
+  description: "Unit tests, fixtures, test tooling under BlinkoApp/Tests."
+
+- name: "🧩 Area: UI"
+  color: "1d76db"
+  description: "SwiftUI views, layout, assets, visual presentation."
+
+- name: "🧩 Area: ViewModels"
+  color: "1d76db"
+  description: "ViewModels, presentation state, UI binding logic."
+
+# --- Automation ---
+
+- name: "🕰️ Automation: Stale issue"
+  color: "9e9e9e"
+  description: "Marked stale by the stale workflow."
+
+- name: "🕰️ Automation: Stale pull request"
+  color: "9e9e9e"
+  description: "Marked stale by the stale workflow."
+
+# --- Platform ---
+
+- name: "📱 Platform: iPhone"
+  color: "4285f4"
+  description: "Specific to iPhone layout or behavior."
+
+- name: "📱 Platform: iPad"
+  color: "3b82f6"
+  description: "Specific to iPad layout or multitasking."
+
+- name: "📱 Platform: Simulator"
+  color: "7cb342"
+  description: "Simulator-only issue (device builds fine)."
+
+# --- Effort ---
+
+- name: "⏱️ Effort: Large"
+  color: "ef6c00"
+  description: "Significant effort; likely several days."
+
+- name: "⏱️ Effort: Medium"
+  color: "ffca28"
+  description: "Moderate task; likely a day or two."
+
+- name: "⏱️ Effort: Small"
+  color: "66bb6a"
+  description: "Quick fix; likely less than a few hours."
+
+# --- Meta ---
+
+- name: "🧷 Meta: Good First Issue"
+  color: "7e57c2"
+  description: "Good entry point for newcomers."
+
+- name: "🧷 Meta: Help Wanted"
+  color: "26a69a"
+  description: "Extra attention or external help would be useful."
+
+- name: "🧷 Meta: Needs Discussion"
+  color: "f06292"
+  description: "Requires a product or technical decision before coding."
+
+- name: "🧪 Meta: Needs Repro"
+  color: "fb8c00"
+  description: "Needs a reproducible case, device logs, or exact steps."
+
+# --- Priority ---
+
+- name: "🔥 Priority: Critical"
+  color: "d32f2f"
+  description: "Urgent; blocks development or breaks core functionality."
+
+- name: "🔥 Priority: High"
+  color: "ffb74d"
+  description: "Important and should be handled soon."
+
+- name: "🔥 Priority: Low"
+  color: "b3e5fc"
+  description: "Can wait; not urgent."
+
+- name: "🔥 Priority: Medium"
+  color: "fff176"
+  description: "Normal priority."
+
+# --- Source ---
+
+- name: "🤖 Source: Copilot"
+  color: "8957e5"
+  description: "Pull request opened by GitHub Copilot."
+
+- name: "🤖 Source: Dependabot"
+  color: "0366d6"
+  description: "Pull request opened by Dependabot."
+
+# --- Status ---
+
+- name: "🚦 Status: Blocked"
+  color: "e53935"
+  description: "Blocked by a dependency, API limitation, or external constraint."
+
+- name: "🚦 Status: Duplicate"
+  color: "cfd8dc"
+  description: "This issue or PR already exists elsewhere."
+
+- name: "🚦 Status: In Progress"
+  color: "4fc3f7"
+  description: "Currently being worked on."
+
+- name: "🚦 Status: Invalid"
+  color: "eceff1"
+  description: "Not reproducible or outside the project scope."
+
+- name: "🚦 Status: Needs Info"
+  color: "ff8a65"
+  description: "More information is required from the reporter or stakeholder."
+
+- name: "🚦 Status: On Hold"
+  color: "90a4ae"
+  description: "Work is paused for now."
+
+- name: "🚦 Status: Ready"
+  color: "00c853"
+  description: "Ready to merge or close; no additional review expected."
+
+- name: "🚦 Status: Review Needed"
+  color: "ffd54f"
+  description: "Work is done and awaiting review."
+
+- name: "🚦 Status: Won't Fix"
+  color: "ffffff"
+  description: "Will not be worked on by design or decision."
+
+# --- Type ---
+
+- name: "🏗️ Type: Build"
+  color: "b0bec5"
+  description: "Build, packaging, Xcode project, release, or CI workflow changes."
+
+- name: "🐞 Type: Bug"
+  color: "d32f2f"
+  description: "Something is not working as intended."
+
+- name: "🧹 Type: Chore"
+  color: "cfd8dc"
+  description: "Routine maintenance with no product behavior change."
+
+- name: "📦 Type: Dependency"
+  color: "0366d6"
+  description: "Dependency bumps and lockfile updates."
+
+- name: "📚 Type: Documentation"
+  color: "0288d1"
+  description: "Documentation improvements or additions."
+
+- name: "✨ Type: Enhancement"
+  color: "81c784"
+  description: "Incremental improvement to an existing capability."
+
+- name: "🚀 Type: Feature"
+  color: "388e3c"
+  description: "Major new feature or significant capability."
+
+- name: "⚡ Type: Performance"
+  color: "ffd180"
+  description: "Performance improvements in UI, networking, or sync."
+
+- name: "❓ Type: Question"
+  color: "ab47bc"
+  description: "Further information or clarification is requested."
+
+- name: "🧼 Type: Refactor"
+  color: "f48fb1"
+  description: "Code change that neither fixes a bug nor adds a feature."
+
+- name: "🔒 Type: Security"
+  color: "d32f2f"
+  description: "Security fix or hardening change."
+
+- name: "🧪 Type: Test"
+  color: "aed581"
+  description: "Adding, updating, or fixing tests."
