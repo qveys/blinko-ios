@@ -23,15 +23,18 @@ needs — see [Branch protection](#branch-protection) below.
 
 | Workflow | File | Trigger | Purpose |
 |---|---|---|---|
-| **Triage** | `.github/workflows/triage.yml` | PR open/edit/sync; issue open/edit; `/triage` comment | Auto-label by path (`.github/labeler.yml`), normalize titles to conventional-commit style |
-| **Sync Labels** | `.github/workflows/sync-labels.yml` | Push to `main` touching `labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
+| **Triage** | `.github/workflows/triage.yml` | PR open/edit/reopen/sync; issue open/edit/reopen; `/triage` on a PR (OWNER/MEMBER only) | Auto-label by path (`.github/labeler.yml`), normalize titles to conventional-commit style |
+| **Sync Labels** | `.github/workflows/sync-labels.yml` | Push to `main` touching `.github/labels.yml` or `.github/workflows/sync-labels.yml`, or manual | Create/update GitHub labels from `.github/labels.yml` |
 | **Stale** | `.github/workflows/stale.yml` | Daily cron + manual | Mark inactive issues/PRs after 60 days (never auto-closes) |
 
 Labels are defined in `.github/labels.yml` (source of truth). Path → area mapping
-lives in `.github/labeler.yml`. Type / Priority / Effort labels stay manual
-(`sync-labels: false` on the labeler step).
+lives in `.github/labeler.yml`. The labeler step uses `sync-labels: true` so
+obsolete **Area** labels are removed when paths no longer match; Type / Priority /
+Effort / Platform and other labels outside `labeler.yml` stay manual.
 
 Issue forms live under `.github/ISSUE_TEMPLATE/` (bug report, feature request).
+Blank issues are disabled; server, API, and product questions are directed to
+upstream Blinko via the contact link in `config.yml`.
 Dependabot (`.github/dependabot.yml`) bumps GitHub Actions weekly and will open
 Swift Package Manager updates under `BlinkoApp/` once remote deps exist.
 

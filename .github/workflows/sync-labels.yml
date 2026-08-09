@@ -41,10 +41,16 @@ jobs:
           )
           raise "labels.yml must be an array" unless desired.is_a?(Array)
 
-          output, status = Open3.capture2("gh", "api", "repos/#{ENV.fetch("GH_REPO")}/labels", "--paginate")
+          # --slurp wraps each paginated page in one outer array so multi-page
+          # label lists remain valid JSON (plain --paginate concatenates arrays).
+          output, status = Open3.capture2(
+            "gh", "api", "repos/#{ENV.fetch("GH_REPO")}/labels",
+            "--paginate", "--slurp"
+          )
           raise "Unable to fetch current labels" unless status.success?
 
-          current = JSON.parse(output)
+          pages = JSON.parse(output)
+          current = pages.flatten
           desired_by_name = desired.each_with_object({}) { |label, acc| acc[label.fetch("name")] = label }
           current_by_name = current.each_with_object({}) { |label, acc| acc[label.fetch("name")] = label }
 

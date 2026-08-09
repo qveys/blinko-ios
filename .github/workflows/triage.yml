@@ -69,8 +69,9 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.pull_request.number || github.event.issue.number }}
-          # Preserves manually-applied taxonomies (Type, Priority, Effort, Platform).
-          sync-labels: false
+          # Removes obsolete Area labels from labeler.yml. Labels outside
+          # labeler.yml (Type, Priority, Effort, Platform, …) stay manual.
+          sync-labels: true
 
   normalize-title:
     needs: triage-gate

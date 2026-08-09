@@ -11,9 +11,15 @@ body:
         - iPhone
         - iPad
         - Simulator
-        - Other (please specify in description)
+        - Other
     validations:
       required: true
+  - type: input
+    id: device-details
+    attributes:
+      label: Device model or simulator details
+      description: If you selected Other (or want more precision), specify the model or simulator here.
+      placeholder: "e.g. iPhone 16 Pro, Mac Catalyst, Vision Pro"
   - type: input
     id: ios-version
     attributes:
@@ -55,5 +61,8 @@ body:
     id: logs
     attributes:
       label: Logs / crash info
-      description: Relevant Console.app lines, Xcode console output, or crash report excerpts.
+      description: >
+        Relevant Console.app lines, Xcode console output, or crash report excerpts.
+        Redact tokens, passwords, note content, account identifiers, private paths,
+        and server credentials before submitting — issue bodies are public.
       render: shell
