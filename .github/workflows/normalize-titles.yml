@@ -1,0 +1,154 @@
+name: Normalize Issue And PR Titles
+
+# Prefix titles with a random type emoji and conventional-commit shape:
+#   ✨ feat(scope): description
+# Runs on issue/PR open, edit, reopen (not on every push — avoid title thrash).
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  pull_request_target:
+    types: [opened, edited, reopened]
+
+jobs:
+  normalize:
+    name: Normalize title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Normalize title
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const ccTypes = [
+              "feat",
+              "fix",
+              "docs",
+              "style",
+              "refactor",
+              "perf",
+              "test",
+              "chore",
+              "ci",
+              "build",
+              "revert",
+            ];
+
+            const emojiPoolByType = {
+              feat: ["✨", "🎉", "🚀", "💡", "🌟"],
+              fix: ["🩹", "🔒", "🐛", "🚑", "💊"],
+              docs: ["📝", "📖", "📚", "🗒️", "✍️"],
+              style: ["🎨", "💄", "✏️", "🖌️", "💅"],
+              refactor: ["♻️", "🔄", "🧱", "🏗️", "🔨"],
+              perf: ["⚡️", "🚀", "🏎️", "💨", "⏱️"],
+              test: ["✅", "🧪", "🔍", "🧬", "🎯"],
+              chore: ["🧹", "🔧", "🗑️", "📦", "🛠️"],
+              ci: ["🤖", "⚙️", "🔁", "🏭", "🔌"],
+              build: ["🏗️", "📦", "🔨", "🧱", "⚒️"],
+              revert: ["⏪", "↩️", "🔙", "♻️", "🔄"],
+            };
+
+            const randomEmoji = (type) => {
+              const pool = emojiPoolByType[type];
+              return pool[Math.floor(Math.random() * pool.length)];
+            };
+
+            const issue = context.payload.pull_request ?? context.payload.issue;
+            if (!issue) {
+              core.info("No issue or pull_request payload found; skipping.");
+              return;
+            }
+
+            const originalTitle = issue.title.trim();
+            if (!originalTitle) {
+              core.info("Empty title; skipping.");
+              return;
+            }
+
+            // Already "emoji type(scope)!: description"
+            const exactPattern = new RegExp(
+              `^[^\\x20-\\x7E][^\\x20-\\x7E]* (${ccTypes.join("|")})(\\([^)]+\\))?(!)?: .*\\S$`,
+              "u",
+            );
+            if (exactPattern.test(originalTitle)) {
+              core.info(`Title already matches convention: "${originalTitle}"`);
+              return;
+            }
+
+            const lowerFirst = (value) =>
+              value.length === 0 ? value : value[0].toLowerCase() + value.slice(1);
+
+            const sentenceCase = (value) =>
+              value
+                .replace(/\s+/g, " ")
+                .trim()
+                .replace(/[.。!！?？]+$/u, "");
+
+            const guessType = (title) => {
+              const normalized = title.toLowerCase();
+              if (/\b(ci|workflow|github action|actions|pipeline)\b/.test(normalized)) return "ci";
+              if (/\b(build|release|bundle|compile|packag|xcode)\b/.test(normalized)) return "build";
+              if (/\b(test|spec|coverage|xcresult)\b/.test(normalized)) return "test";
+              if (/\b(readme|doc|docs|documentation|guide|roadmap)\b/.test(normalized)) return "docs";
+              if (/\b(refactor|cleanup|clean up|rename|reorganize)\b/.test(normalized)) return "refactor";
+              if (/\b(perf|performance|speed|faster|optimi[sz]e)\b/.test(normalized)) return "perf";
+              if (/\b(style|format|lint|swiftformat|swiftlint)\b/.test(normalized)) return "style";
+              if (/\b(fix|bug|error|issue|broken|hotfix|repair|crash)\b/.test(normalized)) return "fix";
+              if (/\b(add|create|implement|introduce|support|enable|allow)\b/.test(normalized)) return "feat";
+              return "chore";
+            };
+
+            const plainCcPattern = new RegExp(
+              `^(${ccTypes.join("|")})(\\([^)]+\\))?(!)?:\\s+(.+?)\\s*$`,
+              "i",
+            );
+
+            const prefixedCcPattern = new RegExp(
+              `^[^\\w\\s]+\\s*(${ccTypes.join("|")})(\\([^)]+\\))?(!)?:\\s+(.+?)\\s*$`,
+              "iu",
+            );
+
+            let nextTitle;
+            const plainCcMatch = originalTitle.match(plainCcPattern);
+            if (plainCcMatch) {
+              const [, type, scope = "", bang = "", description] = plainCcMatch;
+              const normalizedType = type.toLowerCase();
+              nextTitle = `${randomEmoji(normalizedType)} ${normalizedType}${scope}${bang}: ${sentenceCase(description)}`;
+            } else {
+              const prefixedCcMatch = originalTitle.match(prefixedCcPattern);
+              if (prefixedCcMatch) {
+                const [, type, scope = "", bang = "", description] = prefixedCcMatch;
+                const normalizedType = type.toLowerCase();
+                nextTitle = `${randomEmoji(normalizedType)} ${normalizedType}${scope}${bang}: ${sentenceCase(description)}`;
+              } else {
+                const inferredType = guessType(originalTitle);
+                const description = lowerFirst(sentenceCase(originalTitle));
+                nextTitle = `${randomEmoji(inferredType)} ${inferredType}: ${description}`;
+              }
+            }
+
+            if (nextTitle === originalTitle) {
+              core.info("Normalization produced no change; skipping update.");
+              return;
+            }
+
+            core.info(`Updating title from "${originalTitle}" to "${nextTitle}"`);
+
+            if (context.payload.pull_request) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                title: nextTitle,
+              });
+            } else {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                title: nextTitle,
+              });
+            }
