@@ -153,6 +153,16 @@ struct NoteDetailView: View {
                     )
                 }
 
+                Button {
+                    Task { await viewModel.toggleArchive(id: detail.id) }
+                    detail.isArchived.toggle()
+                } label: {
+                    Label(
+                        detail.isArchived ? "Unarchive" : "Archive",
+                        systemImage: detail.isArchived ? "tray.and.arrow.up" : "archivebox"
+                    )
+                }
+
                 Button(role: .destructive) {
                     confirmDelete = true
                 } label: {

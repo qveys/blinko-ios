@@ -37,13 +37,32 @@ struct HomeView: View {
                 notesList
             }
         }
-        .navigationTitle("Blinko")
+        .navigationTitle(viewModel.showsArchived ? "Archived" : "Blinko")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(action: viewModel.composeNote) {
                     Image(systemName: "square.and.pencil")
                 }
                 .accessibilityLabel("New note")
+            }
+            ToolbarItem(placement: .secondaryAction) {
+                // A menu rather than a bare toggle so future scopes (recycle
+                // bin, shared) have an obvious place to land.
+                Menu {
+                    Toggle(
+                        "Show Archived",
+                        systemImage: "archivebox",
+                        isOn: Binding(
+                            get: { viewModel.showsArchived },
+                            set: { newValue in Task { await viewModel.setShowsArchived(newValue) } }
+                        )
+                    )
+                } label: {
+                    Image(systemName: viewModel.showsArchived
+                        ? "line.3.horizontal.decrease.circle.fill"
+                        : "line.3.horizontal.decrease.circle")
+                }
+                .accessibilityLabel("Filter notes")
             }
         }
         .navigationDestination(item: $viewModel.selectedNote) { note in
@@ -73,12 +92,21 @@ struct HomeView: View {
         }
     }
 
+    @ViewBuilder
     private var emptyState: some View {
-        ContentUnavailableView(
-            "No Notes",
-            systemImage: "note.text",
-            description: Text("Tap the compose button to add your first note.")
-        )
+        if viewModel.showsArchived {
+            ContentUnavailableView(
+                "No Archived Notes",
+                systemImage: "archivebox",
+                description: Text("Notes you archive will show up here.")
+            )
+        } else {
+            ContentUnavailableView(
+                "No Notes",
+                systemImage: "note.text",
+                description: Text("Tap the compose button to add your first note.")
+            )
+        }
     }
 
     private var errorState: some View {
@@ -100,6 +128,22 @@ struct HomeView: View {
                         guard note.id == viewModel.notes.last?.id else { return }
                         Task { await viewModel.loadMoreNotes() }
                     }
+                    // Leading swipe mirrors Mail's pin-like affordance;
+                    // trailing carries the destructive/archival pair, matching
+                    // the actions Blinko web exposes on each card's menu.
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        pinButton(for: note)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        trashButton(for: note)
+                        archiveButton(for: note)
+                    }
+                    .contextMenu {
+                        pinButton(for: note)
+                        archiveButton(for: note)
+                        Divider()
+                        trashButton(for: note)
+                    }
             }
             if viewModel.isLoadingMore {
                 HStack {
@@ -111,6 +155,41 @@ struct HomeView: View {
         }
         .listStyle(.plain)
         .refreshable { await viewModel.loadNotes() }
+    }
+
+    /// Pin/unpin — label and icon flip with the note's current state.
+    private func pinButton(for note: Note) -> some View {
+        Button {
+            Task { await viewModel.togglePin(id: note.id, isPinned: note.isPinned) }
+        } label: {
+            Label(
+                note.isPinned ? "Unpin" : "Pin",
+                systemImage: note.isPinned ? "pin.slash" : "pin"
+            )
+        }
+        .tint(.orange)
+    }
+
+    /// Archive/unarchive — the row leaves the current scope on success.
+    private func archiveButton(for note: Note) -> some View {
+        Button {
+            Task { await viewModel.toggleArchive(id: note.id) }
+        } label: {
+            Label(
+                note.isArchived ? "Unarchive" : "Archive",
+                systemImage: note.isArchived ? "tray.and.arrow.up" : "archivebox"
+            )
+        }
+        .tint(.indigo)
+    }
+
+    /// Soft-delete into the recycle bin — reuses the existing trash flow.
+    private func trashButton(for note: Note) -> some View {
+        Button(role: .destructive) {
+            Task { await viewModel.trashNote(id: note.id) }
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
     }
 
     /// Skeleton rows that match the real row height, so the list does not
