@@ -60,6 +60,9 @@ final class AppCoordinator: ObservableObject {
 
     func signOut() async {
         await services?.authService.logout()
+        // Drop the tags cache with the session: the next sign-in on this
+        // device may be a different account, which must not see these tags.
+        await services?.tagsCacheStore.clear()
         UserDefaults.standard.removeObject(forKey: serverURLKey)
         isAuthenticated = false
         currentUser = nil

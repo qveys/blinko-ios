@@ -15,6 +15,9 @@ final class ServiceContainer: ObservableObject {
     let noteService: any NoteServiceProtocol
     let tagService: any TagServiceProtocol
     let authService: any AuthServiceProtocol
+    /// Offline read cache for the tag filter sheet, keyed to this
+    /// container's server. Cleared on sign-out by the coordinator.
+    let tagsCacheStore: any TagsCacheStore
 
     init(serverURL: URL, session: URLSession = .shared, tokenStore: any TokenStore = KeychainTokenStore()) {
         self.serverURL = serverURL
@@ -28,6 +31,7 @@ final class ServiceContainer: ObservableObject {
         self.noteService = NoteService(httpClient: httpClient)
         self.tagService = TagService(httpClient: httpClient)
         self.authService = AuthService(httpClient: httpClient, tokenStore: tokenStore)
+        self.tagsCacheStore = FileTagsCacheStore(serverURL: serverURL)
     }
 
     /// Container built from explicit services, for previews and tests.
@@ -36,12 +40,14 @@ final class ServiceContainer: ObservableObject {
         tokenStore: any TokenStore,
         noteService: any NoteServiceProtocol,
         tagService: any TagServiceProtocol,
-        authService: any AuthServiceProtocol
+        authService: any AuthServiceProtocol,
+        tagsCacheStore: (any TagsCacheStore)? = nil
     ) {
         self.serverURL = serverURL
         self.tokenStore = tokenStore
         self.noteService = noteService
         self.tagService = tagService
         self.authService = authService
+        self.tagsCacheStore = tagsCacheStore ?? InMemoryTagsCacheStore(serverURL: serverURL)
     }
 }

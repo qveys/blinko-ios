@@ -13,6 +13,9 @@ import SwiftUI
 /// chips below the excerpt. Tapping the row is handled by the parent list.
 struct NoteRowView: View {
     let note: Note
+    /// Fired with the tapped tag when chips should act as filters (the home
+    /// feed). `nil` keeps them read-only (previews, embedded contexts).
+    var onTagTap: ((Tag) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -32,7 +35,7 @@ struct NoteRowView: View {
             }
 
             if !note.tags.isEmpty {
-                NoteTagChipRow(tags: note.tags)
+                NoteTagChipRow(tags: note.tags, onTap: onTagTap)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
