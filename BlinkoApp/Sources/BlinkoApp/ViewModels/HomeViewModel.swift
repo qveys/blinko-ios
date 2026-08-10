@@ -24,9 +24,13 @@ final class HomeViewModel: ObservableObject {
     /// Internal (not private) so the detail/editor screens spawned from this
     /// list can reuse the same service instance.
     let noteService: any NoteServiceProtocol
+    /// Handed to editor screens for hashtag typeahead suggestions (BLI-39).
+    /// Optional so tests and previews that don't exercise tags need no mock.
+    let tagService: (any TagServiceProtocol)?
 
-    init(noteService: any NoteServiceProtocol) {
+    init(noteService: any NoteServiceProtocol, tagService: (any TagServiceProtocol)? = nil) {
         self.noteService = noteService
+        self.tagService = tagService
     }
 
     var canLoadMore: Bool { syncMetadata.hasMore && !isLoading && !isLoadingMore }
