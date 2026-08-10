@@ -50,6 +50,7 @@ struct NoteDetailView: View {
         .navigationDestination(isPresented: $editRequested) {
             NoteEditorView(
                 noteService: viewModel.noteService,
+                tagService: viewModel.tagService,
                 note: detail,
                 onSaved: { saved in
                     detail = saved
