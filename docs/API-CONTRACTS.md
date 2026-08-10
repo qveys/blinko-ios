@@ -131,11 +131,32 @@ Two decoding traps, both handled:
   markdown body on write. The client does not maintain the tag list separately;
   editing content reassigns tags server-side.
 
+### Scopes: active vs. archived vs. trashed
+
+`isArchived` on the list request is a tri-state filter: `false` (the default
+feed) *excludes* archived notes, `true` returns *only* archived ones, and
+`null` disables the filter entirely. The active and archived scopes are
+therefore disjoint — a note archived from the default list disappears from it
+and shows up under the archived filter, exactly as on Blinko web. `isRecycle`
+works the same way, and trashed notes never appear in either scope.
+
+### Ordering: pinned first
+
+Blinko web orders the feed pinned-first (`isTop desc`), then by the requested
+`orderBy` on `updatedAt`. The server's list endpoint does this itself; the
+client re-applies the same rule locally only when a pin toggle changes a row's
+group, rather than refetching the page (`HomeViewModel.togglePin`). The sort
+must be stable — within the pinned and unpinned groups the server's recency
+order is preserved.
+
 ### Write — `POST /api/v1/note/upsert`
 
 One endpoint for create and update: omit `id` to create, pass it to update.
 Every other field is optional and omitted fields are left untouched, so partial
-updates work (`setTop`, `setArchived` send only what changed).
+updates work (`setTop`, `setArchived` send only what changed). Pin/unpin is
+`{"id": n, "isTop": true|false}`; archive/unarchive is
+`{"id": n, "isArchived": true|false}` — there are no dedicated tRPC routes for
+either, and the response is the full updated note either way.
 
 ### Deletion is two-stage
 
