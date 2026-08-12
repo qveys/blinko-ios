@@ -125,7 +125,11 @@ struct NoteEditorView: View {
             if let hint = viewModel.attachmentHint {
                 Label(hint, systemImage: viewModel.isUploadingAttachment ? "arrow.triangle.2.circlepath" : "exclamationmark.triangle")
                     .font(.footnote)
-                    .foregroundStyle(viewModel.isUploadingAttachment ? .secondary : .orange)
+                    .foregroundStyle(
+                        viewModel.isUploadingAttachment
+                            ? AnyShapeStyle(.secondary)
+                            : AnyShapeStyle(.orange)
+                    )
             }
 
             ForEach(viewModel.attachments) { attachment in
