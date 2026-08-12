@@ -11,43 +11,70 @@ import SwiftUI
 /// Failure UX (the BLI-20 acceptance criterion): a failed save keeps the
 /// draft in the editor and offers Retry — nothing the user typed is lost.
 /// Cancelling with unsaved text asks before discarding.
+///
+/// Tag typeahead (BLI-39): typing `#` surfaces matching existing tags in a
+/// bar above the keyboard; tapping one splices `#tag ` into the content at
+/// the token. The editor is a `UITextView` wrapper because the typeahead is
+/// caret-driven and `TextEditor` cannot report the caret.
 struct NoteEditorView: View {
     @StateObject private var viewModel: NoteEditorViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var confirmDiscard = false
-    @FocusState private var editorFocused: Bool
+    @State private var editorFocused = false
+    /// One-shot caret move request consumed by ``MarkdownTextView`` after a
+    /// suggestion is accepted.
+    @State private var caretRequest: Int?
 
     /// - Parameters:
+    ///   - tagService: source for hashtag typeahead suggestions; `nil`
+    ///     disables the typeahead (previews/legacy call sites).
     ///   - note: the note to edit, or `nil` to create a new one.
     ///   - onSaved: receives the server's copy after a successful save.
     init(
         noteService: any NoteServiceProtocol,
+        tagService: (any TagServiceProtocol)? = nil,
         note: Note? = nil,
         onSaved: @escaping (Note) -> Void = { _ in }
     ) {
         _viewModel = StateObject(
-            wrappedValue: NoteEditorViewModel(noteService: noteService, note: note, onSaved: onSaved)
+            wrappedValue: NoteEditorViewModel(
+                noteService: noteService,
+                tagService: tagService,
+                note: note,
+                onSaved: onSaved
+            )
         )
     }
 
     var body: some View {
-        TextEditor(text: $viewModel.content)
-            .font(.body.monospaced())
-            .autocorrectionDisabled(false)
-            .focused($editorFocused)
-            .padding(.horizontal, 12)
-            .overlay(alignment: .topLeading) {
-                if viewModel.content.isEmpty {
-                    // TextEditor has no placeholder; fake one that doesn't
-                    // intercept taps.
-                    Text("Write in markdown — the first line becomes the title.")
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 17)
-                        .padding(.top, 8)
-                        .allowsHitTesting(false)
-                }
+        MarkdownTextView(
+            text: $viewModel.content,
+            caretRequest: $caretRequest,
+            isFocused: $editorFocused,
+            onCaretChange: { viewModel.caretMoved(toUTF16Offset: $0) }
+        )
+        .overlay(alignment: .topLeading) {
+            if viewModel.content.isEmpty {
+                // UITextView has no placeholder; fake one that doesn't
+                // intercept taps.
+                Text("Write in markdown — the first line becomes the title.")
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 17)
+                    .padding(.top, 8)
+                    .allowsHitTesting(false)
             }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showSuggestionBar {
+                TagSuggestionBar(
+                    suggestions: viewModel.tagSuggestions,
+                    showNoMatch: viewModel.showNoTagMatch,
+                    isLoading: viewModel.isLoadingTags,
+                    onSelect: acceptSuggestion
+                )
+            }
+        }
             .navigationTitle(isEditing ? "Edit Note" : "New Note")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
@@ -101,6 +128,21 @@ struct NoteEditorView: View {
         return false
     }
 
+    /// The bar occupies space only when it has something to say: matches,
+    /// the `No tag found` row, or the initial-load spinner.
+    private var showSuggestionBar: Bool {
+        !viewModel.tagSuggestions.isEmpty || viewModel.showNoTagMatch || viewModel.isLoadingTags
+    }
+
+    private func acceptSuggestion(_ suggestion: TagTypeahead.Suggestion) {
+        if let caret = viewModel.acceptSuggestion(suggestion) {
+            // Move the caret past the inserted `#tag ` and keep the keyboard
+            // up — focus stays in the editor per the spec.
+            caretRequest = caret
+            editorFocused = true
+        }
+    }
+
     private func cancel() {
         if viewModel.hasUnsavedChanges {
             confirmDiscard = true
@@ -119,7 +161,7 @@ struct NoteEditorView: View {
 #if DEBUG
 #Preview("Create") {
     NavigationStack {
-        NoteEditorView(noteService: MockNoteService())
+        NoteEditorView(noteService: MockNoteService(), tagService: MockTagService())
     }
 }
 
@@ -132,7 +174,7 @@ struct NoteEditorView: View {
         updatedAt: base
     )
     return NavigationStack {
-        NoteEditorView(noteService: MockNoteService(notes: [note]), note: note)
+        NoteEditorView(noteService: MockNoteService(notes: [note]), tagService: MockTagService(), note: note)
     }
 }
 #endif

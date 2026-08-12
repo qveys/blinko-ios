@@ -50,6 +50,7 @@ struct NoteDetailView: View {
         .navigationDestination(isPresented: $editRequested) {
             NoteEditorView(
                 noteService: viewModel.noteService,
+                tagService: viewModel.tagService,
                 note: detail,
                 onSaved: { saved in
                     detail = saved
@@ -97,7 +98,14 @@ struct NoteDetailView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Tags")
                     .font(.headline)
-                NoteTagChipRow(tags: detail.tags)
+                NoteTagChipRow(tags: detail.tags, onTap: { tag in
+                    // Chip tap-through: pop back to the list with the tag
+                    // applied as its filter (BLI-29).
+                    Task {
+                        viewModel.dismissDetail()
+                        await viewModel.applyTagFilter(tag, in: detail.tags)
+                    }
+                })
             }
         }
 

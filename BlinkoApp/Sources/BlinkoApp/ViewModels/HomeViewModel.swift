@@ -1,6 +1,17 @@
 import Combine
 import Foundation
 
+/// The tag filter applied to the notes list: the server-side `tagId` plus the
+/// full slash-joined path for display in the removable chip.
+///
+/// A value type rather than a `Tag` so the chip label survives tag-list
+/// refreshes and works when the tap originated from a note row (where only
+/// leaf rows are joined).
+struct ActiveTagFilter: Equatable, Sendable {
+    let id: Int
+    let fullPath: String
+}
+
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published private(set) var notes: [Note] = []
@@ -15,6 +26,17 @@ final class HomeViewModel: ObservableObject {
 
     private(set) var syncMetadata = SyncMetadata.initial
 
+    /// The tag the notes list is currently filtered by, or `nil` for all
+    /// notes. Set from the tag filter sheet or by tapping a chip on a card;
+    /// cleared by the filter chip's clear affordance. Carries the full
+    /// slash-joined path so the chip can render `#work/projects` without
+    /// another lookup.
+    @Published private(set) var activeTagFilter: ActiveTagFilter?
+
+    /// True while the filter sheet is presented. Owned here so chip taps on
+    /// note rows and the toolbar button share one presentation flag.
+    @Published var isTagFilterSheetPresented = false
+
     /// The note the user just tapped, pushed onto the detail route. `nil`
     /// when the list is showing. Drives a `navigationDestination` in
     /// `HomeView`, so tapping different rows swaps the detail screen without a
@@ -24,9 +46,13 @@ final class HomeViewModel: ObservableObject {
     /// Internal (not private) so the detail/editor screens spawned from this
     /// list can reuse the same service instance.
     let noteService: any NoteServiceProtocol
+    /// Handed to editor screens for hashtag typeahead suggestions (BLI-39).
+    /// Optional so tests and previews that don't exercise tags need no mock.
+    let tagService: (any TagServiceProtocol)?
 
-    init(noteService: any NoteServiceProtocol) {
+    init(noteService: any NoteServiceProtocol, tagService: (any TagServiceProtocol)? = nil) {
         self.noteService = noteService
+        self.tagService = tagService
     }
 
     var canLoadMore: Bool { syncMetadata.hasMore && !isLoading && !isLoadingMore }
@@ -39,7 +65,11 @@ final class HomeViewModel: ObservableObject {
 
         syncMetadata.reset()
         do {
-            let request = NoteListRequest(page: 1, size: syncMetadata.size)
+            let request = NoteListRequest(
+                page: 1,
+                size: syncMetadata.size,
+                tagId: activeTagFilter?.id
+            )
             let page = try await noteService.fetchNotes(request)
             notes = page
             syncMetadata.recordLoadedPage(page, page: 1)
@@ -58,7 +88,11 @@ final class HomeViewModel: ObservableObject {
 
         let nextPage = syncMetadata.nextPage
         do {
-            let request = NoteListRequest(page: nextPage, size: syncMetadata.size)
+            let request = NoteListRequest(
+                page: nextPage,
+                size: syncMetadata.size,
+                tagId: activeTagFilter?.id
+            )
             let page = try await noteService.fetchNotes(request)
             notes.append(contentsOf: page)
             syncMetadata.recordLoadedPage(page, page: nextPage)
@@ -79,6 +113,31 @@ final class HomeViewModel: ObservableObject {
             notes.insert(removed, at: min(index, notes.count))
             present(error)
         }
+    }
+
+    /// Applies a tag as the note-list filter and reloads from page 1.
+    /// No-op when the tag is already the active filter, so re-tapping the
+    /// same chip doesn't flash the list.
+    func applyTagFilter(_ filter: ActiveTagFilter) async {
+        isTagFilterSheetPresented = false
+        guard filter != activeTagFilter else { return }
+        activeTagFilter = filter
+        await loadNotes()
+    }
+
+    /// Convenience for chip taps, where only the `Tag` row is at hand: the
+    /// full path is resolved against the note's joined tags (Blinko joins
+    /// every path segment row onto the note, so ancestors are present).
+    func applyTagFilter(_ tag: Tag, in tags: [Tag]) async {
+        await applyTagFilter(ActiveTagFilter(id: tag.id, fullPath: tag.fullPath(in: tags)))
+    }
+
+    /// Clears the tag filter and returns to all notes. Never touches note
+    /// content or tag records — filtering is read-only.
+    func clearTagFilter() async {
+        guard activeTagFilter != nil else { return }
+        activeTagFilter = nil
+        await loadNotes()
     }
 
     /// Tapping a row opens the note's detail route.
