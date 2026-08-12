@@ -24,9 +24,16 @@ final class HomeViewModel: ObservableObject {
     /// Internal (not private) so the detail/editor screens spawned from this
     /// list can reuse the same service instance.
     let noteService: any NoteServiceProtocol
+    /// Internal (not private) so compose/edit screens can upload images through
+    /// the same authenticated service stack.
+    let attachmentService: any AttachmentServiceProtocol
 
-    init(noteService: any NoteServiceProtocol) {
+    init(
+        noteService: any NoteServiceProtocol,
+        attachmentService: any AttachmentServiceProtocol = MockAttachmentService()
+    ) {
         self.noteService = noteService
+        self.attachmentService = attachmentService
     }
 
     var canLoadMore: Bool { syncMetadata.hasMore && !isLoading && !isLoadingMore }

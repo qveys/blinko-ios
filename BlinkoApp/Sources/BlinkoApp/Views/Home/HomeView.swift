@@ -21,8 +21,16 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
 
-    init(noteService: any NoteServiceProtocol) {
-        _viewModel = StateObject(wrappedValue: HomeViewModel(noteService: noteService))
+    init(
+        noteService: any NoteServiceProtocol,
+        attachmentService: any AttachmentServiceProtocol = MockAttachmentService()
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: HomeViewModel(
+                noteService: noteService,
+                attachmentService: attachmentService
+            )
+        )
     }
 
     var body: some View {
@@ -52,6 +60,7 @@ struct HomeView: View {
         .navigationDestination(isPresented: $viewModel.composeRequested) {
             NoteEditorView(
                 noteService: viewModel.noteService,
+                attachmentService: viewModel.attachmentService,
                 onSaved: viewModel.noteSaved
             )
         }

@@ -25,13 +25,21 @@ struct MainTabView: View {
                     .tag(tab)
             }
         }
+        // Attachment views at any depth resolve the authenticated loader from
+        // the environment instead of threading it through initializers.
+        .environment(\.attachmentLoader, services.attachmentLoader)
     }
 
     @ViewBuilder
     private func destination(for tab: BlinkoTab) -> some View {
         switch tab {
         case .home:
-            NavigationStack { HomeView(noteService: services.noteService) }
+            NavigationStack {
+                HomeView(
+                    noteService: services.noteService,
+                    attachmentService: services.attachmentService
+                )
+            }
         case .notes:
             NavigationStack { PlaceholderView(title: tab.title, systemImage: tab.systemImage) }
         case .search:

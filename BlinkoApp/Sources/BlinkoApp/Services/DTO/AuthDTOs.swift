@@ -55,6 +55,16 @@ struct AttachmentUploadResponse: Decodable, Sendable {
         case status, path, type, size
     }
 
+    /// Convenience init for tests and mocks — skips JSON decoding.
+    init(path: String, type: String = "", size: Int64 = 0, name: String = "", message: String = "", status: Int = 200) {
+        self.path = path
+        self.type = type
+        self.size = size
+        self.name = name.isEmpty ? (path as NSString).lastPathComponent : name
+        self.message = message
+        self.status = status
+    }
+
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""

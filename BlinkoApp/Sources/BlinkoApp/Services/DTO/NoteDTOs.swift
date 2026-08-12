@@ -97,7 +97,7 @@ struct NoteUpsertRequest: Encodable, Sendable {
     var references: [Int]?
 
     /// The attachment shape `upsert` accepts: metadata only, no `id`.
-    struct AttachmentPayload: Encodable, Sendable {
+    struct AttachmentPayload: Encodable, Sendable, Equatable {
         var name: String
         var path: String
         var size: Int64
@@ -144,9 +144,13 @@ struct NoteUpsertRequest: Encodable, Sendable {
         )
     }
 
-    /// Updates only the content of an existing note.
-    static func updateContent(id: Int, content: String) -> NoteUpsertRequest {
-        NoteUpsertRequest(id: id, content: content)
+    /// Updates the content and optionally replaces the attachment list.
+    static func updateContent(
+        id: Int,
+        content: String,
+        attachments: [AttachmentPayload]? = nil
+    ) -> NoteUpsertRequest {
+        NoteUpsertRequest(id: id, content: content, attachments: attachments)
     }
 
     /// Toggles the pinned state, leaving everything else untouched.
