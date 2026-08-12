@@ -9,25 +9,30 @@ final class AppCoordinator: ObservableObject {
     @Published private(set) var currentUser: User?
 
     private let tokenStore: any TokenStore
-    private let serverURLKey = "blinko.serverURL"
+    private let serverConfigStore: any ServerConfigStore
 
-    init(tokenStore: any TokenStore = KeychainTokenStore()) {
+    init(
+        tokenStore: any TokenStore = KeychainTokenStore(),
+        serverConfigStore: any ServerConfigStore = UserDefaultsServerConfigStore()
+    ) {
         self.tokenStore = tokenStore
+        self.serverConfigStore = serverConfigStore
     }
 
     /// Testing entry point: pre-wires a `ServiceContainer` without network setup.
     init(tokenStore: any TokenStore = InMemoryTokenStore(), services: ServiceContainer) {
         self.tokenStore = tokenStore
+        self.serverConfigStore = InMemoryServerConfigStore(serverURL: services.serverURL)
         self.services = services
         self.serverURL = services.serverURL
     }
 
-    /// Restores a previous session from Keychain + UserDefaults.
+    /// Restores a previous session from Keychain + persistent config.
+    ///
     /// Call once from `BlinkoApp.init` or `.task` on the root scene.
     func restoreSession() async {
         guard
-            let raw = UserDefaults.standard.string(forKey: serverURLKey),
-            let url = URL(string: raw),
+            let url = serverConfigStore.serverURL,
             let token = await tokenStore.token, !token.isEmpty
         else { return }
         serverURL = url
@@ -38,7 +43,7 @@ final class AppCoordinator: ObservableObject {
     /// Points the app at a Blinko instance, preserving any stored token.
     func configure(serverURL: URL) {
         self.serverURL = serverURL
-        UserDefaults.standard.set(serverURL.absoluteString, forKey: serverURLKey)
+        serverConfigStore.save(serverURL: serverURL)
         self.services = ServiceContainer(serverURL: serverURL, tokenStore: tokenStore)
         self.isAuthenticated = false
         self.currentUser = nil
@@ -60,9 +65,11 @@ final class AppCoordinator: ObservableObject {
 
     func signOut() async {
         await services?.authService.logout()
-        UserDefaults.standard.removeObject(forKey: serverURLKey)
+        serverConfigStore.clear()
         isAuthenticated = false
         currentUser = nil
+        serverURL = nil
+        services = nil
     }
 
     /// Call when any API call returns `.unauthorized`. Routes the user back to sign-in.
