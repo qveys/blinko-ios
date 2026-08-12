@@ -15,7 +15,11 @@ protocol ServerConfigStore: Sendable {
 }
 
 /// UserDefaults-backed implementation used in production.
-struct UserDefaultsServerConfigStore: ServerConfigStore {
+///
+/// `UserDefaults` is not marked Sendable by the SDK, but it is safe to use
+/// concurrently (Apple documents it as thread-safe), so we opt out of the
+/// strict concurrency check rather than wrapping it in a lock.
+struct UserDefaultsServerConfigStore: ServerConfigStore, @unchecked Sendable {
     private let defaults: UserDefaults
     private let key: String
 

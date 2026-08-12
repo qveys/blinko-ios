@@ -27,15 +27,6 @@ final class AppCoordinator: ObservableObject {
         self.serverURL = services.serverURL
     }
 
-    /// Testing entry point: injects both stores without network setup.
-    init(
-        tokenStore: any TokenStore,
-        serverConfigStore: any ServerConfigStore
-    ) {
-        self.tokenStore = tokenStore
-        self.serverConfigStore = serverConfigStore
-    }
-
     /// Restores a previous session from Keychain + persistent config.
     ///
     /// Call once from `BlinkoApp.init` or `.task` on the root scene.
