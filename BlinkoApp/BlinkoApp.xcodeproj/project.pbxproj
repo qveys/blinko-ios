@@ -119,6 +119,10 @@
 		A2000036 /* TagFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFilterSheet.swift; sourceTree = "<group>"; };
 		A2000037 /* TagTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTreeTests.swift; sourceTree = "<group>"; };
 		A2000038 /* TagFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFilterTests.swift; sourceTree = "<group>"; };
+		A2000039 /* TagTypeahead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTypeahead.swift; sourceTree = "<group>"; };
+		A200003A /* MarkdownTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextView.swift; sourceTree = "<group>"; };
+		A200003B /* TagSuggestionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagSuggestionBar.swift; sourceTree = "<group>"; };
+		A200003C /* TagTypeaheadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTypeaheadTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
