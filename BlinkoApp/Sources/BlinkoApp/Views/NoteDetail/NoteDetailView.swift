@@ -50,6 +50,7 @@ struct NoteDetailView: View {
         .navigationDestination(isPresented: $editRequested) {
             NoteEditorView(
                 noteService: viewModel.noteService,
+                attachmentService: viewModel.attachmentService,
                 note: detail,
                 onSaved: { saved in
                     detail = saved
@@ -91,6 +92,10 @@ struct NoteDetailView: View {
                 .foregroundStyle(.secondary)
         } else {
             MarkdownContentView(markdown: detail.content)
+        }
+
+        if !detail.attachments.isEmpty {
+            NoteAttachmentsSection(note: detail)
         }
 
         if !detail.tags.isEmpty {

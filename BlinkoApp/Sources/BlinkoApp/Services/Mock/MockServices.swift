@@ -239,3 +239,77 @@ actor MockAuthService: AuthServiceProtocol {
 
     func logout() async {}
 }
+
+/// In-memory `AttachmentServiceProtocol`.
+///
+/// Echoes the upload back the way the server would: a timestamped,
+/// space-collapsed stored name under `/api/file/`. Seed `error` to exercise
+/// failure paths.
+actor MockAttachmentService: AttachmentServiceProtocol {
+    /// How an error seeded on this mock behaves across repeated calls.
+    private enum FailureMode {
+        /// Never fails.
+        case none
+        /// Fails every call — for asserting a terminal error state.
+        case always(any Error)
+        /// Fails the next `remaining` calls, then succeeds. Lets one instance
+        /// exercise "upload fails → user taps Retry → it works".
+        case times(remaining: Int, any Error)
+    }
+
+    private var failureMode: FailureMode
+    /// Artificial latency, for observing the in-flight upload state.
+    private let delay: Duration
+    /// Every upload accepted so far, for asserting in tests.
+    private(set) var uploads: [(filename: String, mimeType: String, byteCount: Int)] = []
+
+    init(error: (any Error)? = nil, delay: Duration = .zero) {
+        self.failureMode = error.map { .always($0) } ?? .none
+        self.delay = delay
+    }
+
+    private init(failureMode: FailureMode, delay: Duration) {
+        self.failureMode = failureMode
+        self.delay = delay
+    }
+
+    /// Always fails, for testing error states.
+    static func failing(_ error: any Error = APIError.unauthorized(message: nil)) -> MockAttachmentService {
+        MockAttachmentService(error: error)
+    }
+
+    /// Fails the first `count` uploads, then succeeds. For retry paths.
+    static func failingTimes(
+        _ count: Int,
+        _ error: any Error = APIError.transport("offline"),
+        delay: Duration = .zero
+    ) -> MockAttachmentService {
+        MockAttachmentService(failureMode: .times(remaining: count, error), delay: delay)
+    }
+
+    func upload(data: Data, filename: String, mimeType: String) async throws -> AttachmentUploadResponse {
+        if delay != .zero { try await Task.sleep(for: delay) }
+        switch failureMode {
+        case .none:
+            break
+        case .always(let error):
+            throw error
+        case .times(let remaining, let error):
+            if remaining > 0 {
+                failureMode = .times(remaining: remaining - 1, error)
+                throw error
+            }
+        }
+        uploads.append((filename, mimeType, data.count))
+        // Mirror the server's renaming: spaces collapse to underscores and a
+        // timestamp prefix is added on collision; the prefix alone is enough
+        // for previews.
+        let storedName = "1714746000-" + filename.replacingOccurrences(of: " ", with: "_")
+        return AttachmentUploadResponse(
+            path: "/api/file/\(storedName)",
+            type: mimeType,
+            size: Int64(data.count),
+            name: storedName
+        )
+    }
+}
