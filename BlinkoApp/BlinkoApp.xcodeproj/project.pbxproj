@@ -50,6 +50,8 @@
 		A100002E /* NoteEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* NoteEditorViewModel.swift */; };
 		A100002F /* NoteEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* NoteEditorViewModelTests.swift */; };
 		A1000030 /* MarkdownBlockParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* MarkdownBlockParserTests.swift */; };
+		A1000031 /* MarkdownFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* MarkdownFormatting.swift */; };
+		A1000032 /* MarkdownFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* MarkdownFormattingTests.swift */; };
 		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
 		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
 		A1000029 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* HTTPClientTests.swift */; };
@@ -103,6 +105,8 @@
 		A2000030 /* NoteEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModel.swift; sourceTree = "<group>"; };
 		A2000031 /* NoteEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorViewModelTests.swift; sourceTree = "<group>"; };
 		A2000032 /* MarkdownBlockParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockParserTests.swift; sourceTree = "<group>"; };
+		A2000033 /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
+		A2000034 /* MarkdownFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormattingTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		A200002B /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
@@ -179,6 +183,7 @@
 				A2000008 /* Note.swift */,
 				A2000024 /* Note+Display.swift */,
 				A200002E /* MarkdownBlock.swift */,
+				A2000033 /* MarkdownFormatting.swift */,
 				A2000011 /* SyncMetadata.swift */,
 				A2000012 /* Tag.swift */,
 				A2000025 /* Tag+Display.swift */,
@@ -247,6 +252,7 @@
 				A200002D /* HomeViewModelNavigationTests.swift */,
 				A2000031 /* NoteEditorViewModelTests.swift */,
 				A2000032 /* MarkdownBlockParserTests.swift */,
+				A2000034 /* MarkdownFormattingTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
 				A200001D /* SyncMetadataTests.swift */,
 				A2000022 /* TabNavigationTests.swift */,
@@ -409,6 +415,7 @@
 				A100002C /* MarkdownBlock.swift in Sources */,
 				A100002D /* MarkdownContentView.swift in Sources */,
 				A100002E /* NoteEditorViewModel.swift in Sources */,
+				A1000031 /* MarkdownFormatting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,6 +434,7 @@
 				A100002B /* HomeViewModelNavigationTests.swift in Sources */,
 				A100002F /* NoteEditorViewModelTests.swift in Sources */,
 				A1000030 /* MarkdownBlockParserTests.swift in Sources */,
+				A1000032 /* MarkdownFormattingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
