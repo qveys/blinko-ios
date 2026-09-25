@@ -39,29 +39,64 @@ struct LoginResponse: Decodable, Sendable {
 /// Response from `POST /api/file/upload`.
 ///
 /// Note the capitalized `Message` key — this route is hand-written Express and
-/// does not follow the casing of the generated tRPC routes.
+/// does not follow the casing of the generated tRPC routes. The success body
+/// spreads `FileService.uploadFileStream`'s return value, so the storage keys
+/// are `filePath`/`fileName` (verified against upstream `main` and the web
+/// client, which destructures `{fileName, filePath, type, size}`). `path` is
+/// also accepted as a legacy fallback since our earlier docs recorded it.
 struct AttachmentUploadResponse: Decodable, Sendable {
     let message: String
     let status: Int
+    /// Server-relative path, e.g. `/api/file/1712345678-photo.png` (S3
+    /// deployments return an absolute URL instead). Resolve for display with
+    /// ``Attachment/url(relativeTo:)``.
     let path: String
     let type: String
     let size: Int64
-    /// Not returned by the server; filled in by ``AttachmentService`` from the
-    /// filename it uploaded, because `upsert` requires a name.
-    var name: String = ""
+    /// The stored (timestamped, space-collapsed) filename. Falls back to the
+    /// path's last component when the server omits `fileName`, because
+    /// `note/upsert` requires a name.
+    let name: String
 
     enum CodingKeys: String, CodingKey {
         case message = "Message"
-        case status, path, type, size
+        case status, type, size
+        case filePath, fileName, path
+    }
+
+    /// Memberwise construction, for mocks and previews.
+    init(message: String = "Success", status: Int = 200, path: String, type: String, size: Int64, name: String) {
+        self.message = message
+        self.status = status
+        self.path = path
+        self.type = type
+        self.size = size
+        self.name = name
     }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""
         status = try container.decodeIfPresent(Int.self, forKey: .status) ?? 200
-        path = try container.decode(String.self, forKey: .path)
+        guard let storedPath = try container.decodeIfPresent(String.self, forKey: .filePath)
+            ?? container.decodeIfPresent(String.self, forKey: .path)
+        else {
+            throw DecodingError.keyNotFound(
+                CodingKeys.filePath,
+                DecodingError.Context(
+                    codingPath: container.codingPath,
+                    debugDescription: "Upload response has neither filePath nor path."
+                )
+            )
+        }
+        path = storedPath
         type = try container.decodeIfPresent(String.self, forKey: .type) ?? ""
         size = try container.decodeFlexibleInt64(forKey: .size) ?? 0
-        name = (path as NSString).lastPathComponent
+        let serverName = try container.decodeIfPresent(String.self, forKey: .fileName)
+        if let serverName, !serverName.isEmpty {
+            name = serverName
+        } else {
+            name = (storedPath as NSString).lastPathComponent
+        }
     }
 }
