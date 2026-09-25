@@ -12,7 +12,7 @@ BlinkoApp (@main)
     └── MainTabView              — authenticated shell (TabView)
         ├── Home     → HomeView          (own NavigationStack)
         ├── Notes    → PlaceholderView   (own NavigationStack)
-        ├── Search   → PlaceholderView   (own NavigationStack)
+        ├── Search   → SearchView        (own NavigationStack)
         └── Settings → SettingsTabView   (own NavigationStack)
 ```
 

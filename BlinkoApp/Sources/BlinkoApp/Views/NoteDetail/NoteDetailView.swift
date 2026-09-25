@@ -5,12 +5,15 @@ import SwiftUI
 ///
 /// Editing pushes ``NoteEditorView`` pre-filled with the note's markdown;
 /// a successful save updates both this screen and the owning list through
-/// ``HomeViewModel/noteSaved(_:)``. Delete asks for confirmation first
+/// ``NoteDetailHosting/noteSaved(_:)``. Delete asks for confirmation first
 /// (destructive), soft-deletes into the recycle bin — the same semantics as
 /// Blinko web's delete — and pops back to the list only when the server call
 /// succeeds.
-struct NoteDetailView: View {
-    @ObservedObject var viewModel: HomeViewModel
+/// Generic over its host so the home feed (`HomeViewModel`) and search
+/// results (`SearchViewModel`) push the identical screen — see
+/// ``NoteDetailHosting``.
+struct NoteDetailView<Host: NoteDetailHosting>: View {
+    @ObservedObject var viewModel: Host
     let note: Note
 
     @State private var detail: Note
@@ -23,7 +26,7 @@ struct NoteDetailView: View {
     @State private var deleteError: String?
     @State private var showDeleteError = false
 
-    init(viewModel: HomeViewModel, note: Note) {
+    init(viewModel: Host, note: Note) {
         self.viewModel = viewModel
         self.note = note
         self._detail = State(initialValue: note)

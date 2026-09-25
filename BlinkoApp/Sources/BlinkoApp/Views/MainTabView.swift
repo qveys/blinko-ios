@@ -35,7 +35,7 @@ struct MainTabView: View {
         case .notes:
             NavigationStack { PlaceholderView(title: tab.title, systemImage: tab.systemImage) }
         case .search:
-            NavigationStack { PlaceholderView(title: tab.title, systemImage: tab.systemImage) }
+            NavigationStack { SearchView(noteService: services.noteService) }
         case .settings:
             NavigationStack { SettingsTabView() }
         }
