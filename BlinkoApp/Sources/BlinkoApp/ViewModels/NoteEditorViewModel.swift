@@ -60,6 +60,66 @@ final class NoteEditorViewModel: ObservableObject {
             && !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    // MARK: - Toolbar formatting (BLI-60)
+
+    /// The current cursor selection in `content`, kept in sync by the view via
+    /// a `TextEditor` binding. The toolbar acts on this range; when it's empty
+    /// (collapsed caret) the format delimiters are still inserted and the
+    /// selection advances to sit between them.
+    ///
+    /// Stored as `(Int, Int)` offsets rather than `Range<String.Index>` so
+    /// this `ObservableObject` stays `Sendable`-compatible and the view can
+    /// bind a plain integer pair without importing `SwiftUI` here.
+    var selectionOffsets: (lower: Int, upper: Int) = (0, 0)
+
+    /// Applies an inline style (bold/italic/code) at the current selection.
+    /// Idempotent: toggling a style that already wraps the selection removes it.
+    func applyInline(_ style: MarkdownFormatting.InlineStyle) {
+        let result = MarkdownFormatting.toggleInline(
+            style,
+            in: content,
+            selection: selection(in: content)
+        )
+        content = result.text
+        selectionOffsets = (
+            lower: content.distance(from: content.startIndex, to: result.selection.lowerBound),
+            upper: content.distance(from: content.startIndex, to: result.selection.upperBound)
+        )
+    }
+
+    /// Applies a heading level at the lines touched by the current selection.
+    /// Idempotent: the same level applied twice strips the marker.
+    func applyHeading(level: Int) {
+        let result = MarkdownFormatting.toggleHeading(
+            level: level,
+            in: content,
+            selection: selection(in: content)
+        )
+        content = result.text
+        selectionOffsets = (
+            lower: content.distance(from: content.startIndex, to: result.selection.lowerBound),
+            upper: content.distance(from: content.startIndex, to: result.selection.upperBound)
+        )
+    }
+
+    /// Converts the stored integer offsets back to a `String.Index` range,
+    /// clamped to `content.startIndex...content.endIndex`.
+    private func selection(in text: String) -> Range<String.Index> {
+        let lower = text.index(
+            text.startIndex,
+            offsetBy: min(selectionOffsets.lower, text.count),
+            limitedBy: text.endIndex
+        ) ?? text.endIndex
+        let upper = text.index(
+            text.startIndex,
+            offsetBy: min(selectionOffsets.upper, text.count),
+            limitedBy: text.endIndex
+        ) ?? text.endIndex
+        return lower..<upper
+    }
+
+    // MARK: - Save
+
     /// Persists the draft. Returns `true` on success so the view knows to
     /// dismiss; on failure the draft stays in `content` for retry.
     @discardableResult
