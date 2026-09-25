@@ -194,8 +194,22 @@ enum APIFixtures {
     }
     """
 
-    /// `POST /api/file/upload` — capitalized `Message`, no `name` key.
+    /// `POST /api/file/upload` — capitalized `Message`; storage keys are
+    /// `filePath`/`fileName` because the route spreads
+    /// `FileService.uploadFileStream`'s return value into the response.
     static let attachmentUploadResponse = """
+    {
+      "Message": "Success",
+      "status": 200,
+      "filePath": "/api/file/1714746000-offsite.png",
+      "fileName": "1714746000-offsite.png",
+      "type": "image/png",
+      "size": 20480
+    }
+    """
+
+    /// Same route, older servers: `path` instead of `filePath`, no name key.
+    static let attachmentUploadResponseLegacy = """
     {
       "Message": "Success",
       "status": 200,

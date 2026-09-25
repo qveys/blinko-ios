@@ -18,6 +18,7 @@ final class ServiceContainer: ObservableObject {
     /// Offline read cache for the notes list, keyed to this container's
     /// server. Cleared on sign-out by the coordinator.
     let notesCacheStore: any NotesCacheStore
+    let attachmentService: any AttachmentServiceProtocol
 
     init(serverURL: URL, session: URLSession = .shared, tokenStore: any TokenStore = KeychainTokenStore()) {
         self.serverURL = serverURL
@@ -32,6 +33,7 @@ final class ServiceContainer: ObservableObject {
         self.tagService = TagService(httpClient: httpClient)
         self.authService = AuthService(httpClient: httpClient, tokenStore: tokenStore)
         self.notesCacheStore = FileNotesCacheStore(serverURL: serverURL)
+        self.attachmentService = AttachmentService(httpClient: httpClient)
     }
 
     /// Container built from explicit services, for previews and tests.
@@ -41,7 +43,8 @@ final class ServiceContainer: ObservableObject {
         noteService: any NoteServiceProtocol,
         tagService: any TagServiceProtocol,
         authService: any AuthServiceProtocol,
-        notesCacheStore: (any NotesCacheStore)? = nil
+        notesCacheStore: (any NotesCacheStore)? = nil,
+        attachmentService: (any AttachmentServiceProtocol)? = nil
     ) {
         self.serverURL = serverURL
         self.tokenStore = tokenStore
@@ -49,5 +52,6 @@ final class ServiceContainer: ObservableObject {
         self.tagService = tagService
         self.authService = authService
         self.notesCacheStore = notesCacheStore ?? InMemoryNotesCacheStore(serverURL: serverURL)
+        self.attachmentService = attachmentService ?? MockAttachmentService()
     }
 }
