@@ -165,6 +165,150 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.showError)
     }
 
+    // MARK: - Pinning (BLI-40)
+
+    /// A successful pin floats the row to the top of the list, above the
+    /// other unpinned rows, matching Blinko web's pinned-first ordering.
+    func testTogglePinMovesNoteToTop() async throws {
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: Self.notes(count: 5)))
+        await viewModel.loadNotes()
+        let id = try XCTUnwrap(viewModel.notes.last?.id)
+
+        await viewModel.togglePin(id: id, isPinned: false)
+
+        XCTAssertEqual(viewModel.notes.first?.id, id)
+        XCTAssertTrue(viewModel.notes[0].isTop)
+        XCTAssertFalse(viewModel.showError)
+    }
+
+    /// Pinning a second note keeps both pinned rows ahead of the unpinned
+    /// ones and preserves recency order within the pinned group.
+    func testPinnedSortIsStableWithinGroups() async throws {
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: Self.notes(count: 5)))
+        await viewModel.loadNotes()
+        let firstPinned = viewModel.notes[3].id
+        let secondPinned = viewModel.notes[4].id
+
+        await viewModel.togglePin(id: firstPinned, isPinned: false)
+        await viewModel.togglePin(id: secondPinned, isPinned: false)
+
+        XCTAssertEqual(viewModel.notes.prefix(2).map(\.id), [firstPinned, secondPinned])
+        XCTAssertTrue(viewModel.notes.prefix(2).allSatisfy(\.isTop))
+    }
+
+    /// A failed pin rolls the flag back and never reorders the list.
+    func testFailedTogglePinRollsBackAndKeepsOrder() async throws {
+        let service = MockNoteService(
+            notes: Self.notes(count: 5),
+            writeError: APIError.server(statusCode: 500, message: nil, code: nil)
+        )
+        let viewModel = HomeViewModel(noteService: service)
+        await viewModel.loadNotes()
+        let before = viewModel.notes.map(\.id)
+        let id = try XCTUnwrap(viewModel.notes.last?.id)
+
+        await viewModel.togglePin(id: id, isPinned: false)
+
+        XCTAssertEqual(viewModel.notes.map(\.id), before, "order must not change on failure")
+        XCTAssertFalse(viewModel.notes.last!.isTop, "flag must roll back")
+        XCTAssertTrue(viewModel.showError)
+    }
+
+    // MARK: - Archiving (BLI-40)
+
+    /// Archiving from the active list removes the row — archived notes are
+    /// not part of the default scope.
+    func testToggleArchiveRemovesNoteFromActiveList() async throws {
+        let viewModel = HomeViewModel(noteService: MockNoteService())
+        await viewModel.loadNotes()
+        let id = try XCTUnwrap(viewModel.notes.first?.id)
+        let before = viewModel.notes.count
+
+        await viewModel.toggleArchive(id: id)
+
+        XCTAssertEqual(viewModel.notes.count, before - 1)
+        XCTAssertFalse(viewModel.notes.contains { $0.id == id })
+        XCTAssertFalse(viewModel.showError)
+    }
+
+    /// A failed archive puts the row back in its original position with the
+    /// original flag, and surfaces the error alert.
+    func testFailedToggleArchiveRestoresTheNote() async throws {
+        let service = MockNoteService(
+            writeError: APIError.server(statusCode: 500, message: nil, code: nil)
+        )
+        let viewModel = HomeViewModel(noteService: service)
+        await viewModel.loadNotes()
+        let before = viewModel.notes.map(\.id)
+        let id = try XCTUnwrap(viewModel.notes.first?.id)
+
+        await viewModel.toggleArchive(id: id)
+
+        XCTAssertEqual(viewModel.notes.map(\.id), before, "note should be restored in place")
+        XCTAssertFalse(viewModel.notes.first!.isArchived, "flag must roll back")
+        XCTAssertTrue(viewModel.showError)
+    }
+
+    func testToggleArchiveUnknownIDDoesNothing() async {
+        let viewModel = HomeViewModel(noteService: MockNoteService())
+        await viewModel.loadNotes()
+        let before = viewModel.notes.count
+
+        await viewModel.toggleArchive(id: 999_999)
+
+        XCTAssertEqual(viewModel.notes.count, before)
+        XCTAssertFalse(viewModel.showError)
+    }
+
+    // MARK: - Archived filter (BLI-40)
+
+    /// Switching to the archived scope refetches with `isArchived == true`,
+    /// so only archived notes are shown.
+    func testShowArchivedFetchesOnlyArchivedNotes() async {
+        let base = Date(timeIntervalSince1970: 1_714_000_000)
+        // Distinct ids across the two groups.
+        let archived = (0..<2).map {
+            Note(id: 100 + $0, content: "Archived \($0)", isArchived: true, createdAt: base, updatedAt: base)
+        }
+        let seed = archived + Self.notes(count: 3)
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: seed))
+
+        await viewModel.loadNotes()
+        XCTAssertEqual(viewModel.notes.count, 3, "default scope hides archived notes")
+
+        await viewModel.setShowsArchived(true)
+
+        XCTAssertTrue(viewModel.showsArchived)
+        XCTAssertEqual(viewModel.notes.count, 2)
+        XCTAssertTrue(viewModel.notes.allSatisfy(\.isArchived))
+    }
+
+    /// Unarchiving inside the archived scope removes the row from that scope.
+    func testUnarchiveRemovesNoteFromArchivedList() async throws {
+        let base = Date(timeIntervalSince1970: 1_714_000_000)
+        let archivedNote = Note(id: 1, content: "Archived", isArchived: true, createdAt: base, updatedAt: base)
+        let viewModel = HomeViewModel(noteService: MockNoteService(notes: [archivedNote]))
+        await viewModel.setShowsArchived(true)
+        XCTAssertEqual(viewModel.notes.count, 1)
+
+        await viewModel.toggleArchive(id: 1)
+
+        XCTAssertTrue(viewModel.notes.isEmpty)
+        XCTAssertFalse(viewModel.showError)
+    }
+
+    /// Re-setting the same scope must not refetch (it would clobber optimistic
+    /// state under the user's finger).
+    func testSetShowsArchivedIsNoOpForSameValue() async {
+        let viewModel = HomeViewModel(noteService: MockNoteService())
+        await viewModel.loadNotes()
+        let before = viewModel.notes.map(\.id)
+
+        await viewModel.setShowsArchived(false)
+
+        XCTAssertEqual(viewModel.notes.map(\.id), before)
+    }
+
     // MARK: - Helpers
 
     /// Builds `count` notes with distinct ids and descending timestamps.

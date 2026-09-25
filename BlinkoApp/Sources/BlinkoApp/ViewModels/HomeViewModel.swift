@@ -23,6 +23,11 @@ final class HomeViewModel: ObservableObject, NoteDetailHosting {
     @Published private(set) var staleDataTimestamp: Date?
 
     var isShowingStaleData: Bool { staleDataTimestamp != nil }
+    /// Active list scope. `false` (default) hides archived notes; `true`
+    /// shows only the archived ones via the `isArchived` filter on the
+    /// `/v1/note/list` request. Change it through ``setShowsArchived(_:)``
+    /// so the list refetches with the new filter.
+    @Published private(set) var showsArchived = false
 
     /// The note the user just tapped, pushed onto the detail route. `nil`
     /// when the list is showing. Drives a `navigationDestination` in
@@ -49,6 +54,15 @@ final class HomeViewModel: ObservableObject, NoteDetailHosting {
         syncMetadata.hasMore && !isLoading && !isLoadingMore && !isShowingStaleData
     }
 
+    /// Switches the list between the active and archived scopes and reloads
+    /// from page 1. No-op when the scope is unchanged, so binding re-sets
+    /// don't trigger spurious refetches.
+    func setShowsArchived(_ showsArchived: Bool) async {
+        guard self.showsArchived != showsArchived else { return }
+        self.showsArchived = showsArchived
+        await loadNotes()
+    }
+
     /// Loads the first page, replacing whatever is on screen.
     ///
     /// Offline behavior: a successful load replaces the persisted cache
@@ -66,7 +80,7 @@ final class HomeViewModel: ObservableObject, NoteDetailHosting {
 
         syncMetadata.reset()
         do {
-            let request = NoteListRequest(page: 1, size: syncMetadata.size)
+            let request = NoteListRequest(page: 1, size: syncMetadata.size, isArchived: showsArchived)
             let page = try await noteService.fetchNotes(request)
             notes = page
             syncMetadata.recordLoadedPage(page, page: 1)
@@ -108,7 +122,7 @@ final class HomeViewModel: ObservableObject, NoteDetailHosting {
 
         let nextPage = syncMetadata.nextPage
         do {
-            let request = NoteListRequest(page: nextPage, size: syncMetadata.size)
+            let request = NoteListRequest(page: nextPage, size: syncMetadata.size, isArchived: showsArchived)
             let page = try await noteService.fetchNotes(request)
             notes.append(contentsOf: page)
             syncMetadata.recordLoadedPage(page, page: nextPage)
@@ -185,15 +199,68 @@ final class HomeViewModel: ObservableObject, NoteDetailHosting {
     }
 
     /// Pins or unpins a note, updating the local copy optimistically and rolling
-    /// back on failure. The list itself is server-ordered, so the row is not
-    /// re-sorted — the pinned badge just flips.
+    /// back on failure.
+    ///
+    /// On success the list is re-sorted pinned-first (stable within each
+    /// group, so server recency order is preserved), matching Blinko web
+    /// where pinning floats the note to the top immediately. The re-sort
+    /// happens only after the server confirms — a failed call rolls the badge
+    /// back without ever moving the row.
     func togglePin(id: Int, isPinned: Bool) async {
         guard let index = notes.firstIndex(where: { $0.id == id }) else { return }
         notes[index].isTop.toggle()
         do {
             _ = try await noteService.setTop(id: id, isTop: notes[index].isTop)
+            sortPinnedFirst()
         } catch {
             notes[index].isTop = isPinned
+            present(error)
+        }
+    }
+
+    /// Stable pinned-first ordering: pinned notes ahead of unpinned ones,
+    /// original (server) order preserved within each group. A no-op when the
+    /// server already returned pinned-first pages, which `/v1/note/list` does.
+    private func sortPinnedFirst() {
+        notes = notes.enumerated()
+            .sorted { lhs, rhs in
+                if lhs.element.isTop != rhs.element.isTop { return lhs.element.isTop }
+                return lhs.offset < rhs.offset
+            }
+            .map(\.element)
+    }
+
+    /// Archives or unarchives a note. The flag is flipped optimistically, the
+    /// call is dispatched, and on failure the row is restored to its previous
+    /// position with the original flag. Errors surface through the same alert
+    /// path as the rest of the list.
+    ///
+    /// When the new state is out of the current scope (the active list hides
+    /// archived notes, the archived list shows only archived ones), the row is
+    /// dropped from the in-memory list so the UI mirrors the web behaviour;
+    /// pull-to-refresh restores the server-order if the call actually
+    /// succeeded. The list is server-ordered, so the remaining rows are not
+    /// re-sorted.
+    func toggleArchive(id: Int) async {
+        guard let index = notes.firstIndex(where: { $0.id == id }) else { return }
+        let removed = notes[index]
+        let previousIsArchived = removed.isArchived
+        let newIsArchived = !previousIsArchived
+        let outOfScope = (newIsArchived && !showsArchived)
+            || (!newIsArchived && showsArchived)
+        notes[index].isArchived = newIsArchived
+        if outOfScope {
+            notes.remove(at: index)
+        }
+        do {
+            _ = try await noteService.setArchived(id: id, isArchived: newIsArchived)
+        } catch {
+            // Restore the in-memory state for both branches.
+            if outOfScope {
+                notes.insert(removed, at: min(index, notes.count))
+            } else {
+                notes[index].isArchived = previousIsArchived
+            }
             present(error)
         }
     }
