@@ -10,6 +10,12 @@ on:
   pull_request_target:
     types: [opened, edited, reopened]
 
+# One run at a time per issue/PR: the emoji is random, so two parallel runs on
+# quick successive edits would race and leave whichever title finished last.
+concurrency:
+  group: normalize-title-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   normalize:
     name: Normalize title
@@ -68,12 +74,16 @@ jobs:
               return;
             }
 
-            // Already "emoji type(scope)!: description"
+            // Already "emoji type(scope)!: description". The prefix must be a
+            // real emoji: `[^\x20-\x7E]` alone also matches CJK/accented text,
+            // so a Chinese or Japanese title would be treated as normalized.
+            const emojiPrefix = /^\p{Extended_Pictographic}\uFE0F?/u;
             const exactPattern = new RegExp(
-              `^[^\\x20-\\x7E][^\\x20-\\x7E]* (${ccTypes.join("|")})(\\([^)]+\\))?(!)?: .*\\S$`,
+              `^(${ccTypes.join("|")})(\\([^)]+\\))?(!)?: .*\\S$`,
               "u",
             );
-            if (exactPattern.test(originalTitle)) {
+            const withoutEmoji = originalTitle.replace(emojiPrefix, "").trimStart();
+            if (emojiPrefix.test(originalTitle) && exactPattern.test(withoutEmoji)) {
               core.info(`Title already matches convention: "${originalTitle}"`);
               return;
             }
