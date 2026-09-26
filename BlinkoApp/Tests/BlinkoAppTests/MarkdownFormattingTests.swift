@@ -11,8 +11,10 @@ final class MarkdownFormattingTests: XCTestCase {
         let selection = text.index(text.startIndex, offsetBy: 1)..<text.index(text.startIndex, offsetBy: 5)
 
         let result = MarkdownFormatting.toggleInline(.bold, in: text, selection: selection)
-        XCTAssertEqual(result.text, "**hello world**")
-        XCTAssertEqual(result.selectedOffsets().lowerBound, 2)
+        // The delimiters wrap exactly the selection: "ello" inside "hello world"
+        // becomes h**ello** world, with the selection still covering "ello".
+        XCTAssertEqual(result.text, "h**ello** world")
+        XCTAssertEqual(result.selectedOffsets().lowerBound, 3)
         XCTAssertEqual(result.selectedOffsets().upperBound, 7)
     }
 
@@ -41,9 +43,12 @@ final class MarkdownFormattingTests: XCTestCase {
         let text = "world"
         let selection = text.index(text.startIndex, offsetBy: 5)..<text.endIndex
         let result = MarkdownFormatting.toggleInline(.bold, in: text, selection: selection)
-        XCTAssertEqual(result.text, "world**")
-        XCTAssertEqual(result.selectedOffsets().lowerBound, 5)
-        XCTAssertEqual(result.selectedOffsets().upperBound, 10)
+        // An empty selection inserts both delimiters with the caret between
+        // them, so typing immediately produces bold text. (The previous
+        // expectation asked for offsets 5...10 in a 7-character result.)
+        XCTAssertEqual(result.text, "world****")
+        XCTAssertEqual(result.selectedOffsets().lowerBound, 7)
+        XCTAssertEqual(result.selectedOffsets().upperBound, 7)
     }
 
     // MARK: - Inline: italic
@@ -53,7 +58,8 @@ final class MarkdownFormattingTests: XCTestCase {
         let selection = text.index(text.startIndex, offsetBy: 1)..<text.index(text.startIndex, offsetBy: 5)
 
         let result = MarkdownFormatting.toggleInline(.italic, in: text, selection: selection)
-        XCTAssertEqual(result.text, "hello*world*")
+        // Same rule as bold: the delimiters wrap the selection itself.
+        XCTAssertEqual(result.text, "h*ello* world")
     }
 
     // MARK: - Inline: code
@@ -63,7 +69,7 @@ final class MarkdownFormattingTests: XCTestCase {
         let selection = text.index(text.startIndex, offsetBy: 1)..<text.index(text.startIndex, offsetBy: 5)
 
         let result = MarkdownFormatting.toggleInline(.code, in: text, selection: selection)
-        XCTAssertEqual(result.text, "hello`world`")
+        XCTAssertEqual(result.text, "h`ello` world")
     }
 
     // MARK: - Inline: toggle off
@@ -127,7 +133,9 @@ final class MarkdownFormattingTests: XCTestCase {
     func testHeadingLevelOfNonHeading() {
         XCTAssertNil(MarkdownFormatting.headingLevel(of: "heading"))
         XCTAssertNil(MarkdownFormatting.headingLevel(of: "h heading"))
-        XCTAssertNil(MarkdownFormatting.headingLevel(of: "#"))
+        // A lone "#" is an empty level-1 heading in CommonMark, not a tag:
+        // the marker requires only end-of-line or a space after the hashes.
+        XCTAssertEqual(MarkdownFormatting.headingLevel(of: "#"), 1)
         XCTAssertNil(MarkdownFormatting.headingLevel(of: "heading"))
     }
 
