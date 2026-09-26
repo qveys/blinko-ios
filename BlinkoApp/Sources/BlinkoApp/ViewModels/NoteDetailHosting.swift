@@ -21,6 +21,10 @@ protocol NoteDetailHosting: ObservableObject {
     /// Pins or unpins a note, optimistically, rolling back on failure.
     func togglePin(id: Int, isPinned: Bool) async
 
+    /// Archives or unarchives a note, optimistically, rolling back on
+    /// failure. A note that leaves the current list scope is dropped from it.
+    func toggleArchive(id: Int) async
+
     /// Soft-deletes the note being shown and pops back to the list on
     /// success; rethrows on failure so the detail view surfaces the error.
     func trashFromDetail(id: Int) async throws

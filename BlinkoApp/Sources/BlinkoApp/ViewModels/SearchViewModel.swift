@@ -237,6 +237,21 @@ extension SearchViewModel: NoteDetailHosting {
         }
     }
 
+    /// Archives or unarchives a note from the detail screen, rolling back the
+    /// optimistic toggle if the server refuses.
+    func toggleArchive(id: Int) async {
+        guard let index = results.firstIndex(where: { $0.id == id }) else { return }
+        let previousIsArchived = results[index].isArchived
+        let newIsArchived = !previousIsArchived
+        results[index].isArchived = newIsArchived
+        do {
+            _ = try await noteService.setArchived(id: id, isArchived: newIsArchived)
+        } catch {
+            results[index].isArchived = previousIsArchived
+            present(error)
+        }
+    }
+
     /// Moves a note to the recycle bin on behalf of the detail screen,
     /// dropping the result row and popping back on success. Rethrows so the
     /// detail view can surface the failure itself.
