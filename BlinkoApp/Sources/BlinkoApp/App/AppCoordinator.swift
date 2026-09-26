@@ -68,7 +68,6 @@ final class AppCoordinator: ObservableObject {
         // Drop the offline cache with the session: the next sign-in on this
         // device may be a different account, which must not see these notes.
         await services?.notesCacheStore.clear()
-        UserDefaults.standard.removeObject(forKey: serverURLKey)
         serverConfigStore.clear()
         isAuthenticated = false
         currentUser = nil
