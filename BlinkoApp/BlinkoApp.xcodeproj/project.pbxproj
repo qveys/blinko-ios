@@ -61,6 +61,10 @@
 		A1000504 /* AttachmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000504 /* AttachmentService.swift */; };
 		A1000505 /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000505 /* MultipartFormData.swift */; };
 		A1000506 /* AttachmentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000506 /* AttachmentServiceTests.swift */; };
+		A1000509 /* MarkdownFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000509 /* MarkdownFormatting.swift */; };
+		A1000510 /* MarkdownFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000510 /* MarkdownFormattingTests.swift */; };
+		A1000509 /* MarkdownFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000509 /* MarkdownFormatting.swift */; };
+		A1000510 /* MarkdownFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000510 /* MarkdownFormattingTests.swift */; };
 		A1000027 /* KeychainTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* KeychainTokenStoreTests.swift */; };
 		A1000508 /* ServerConfigStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000508 /* ServerConfigStoreTests.swift */; };
 		A1000028 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* AppCoordinatorTests.swift */; };
@@ -126,6 +130,10 @@
 		A2000504 /* AttachmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentService.swift; sourceTree = "<group>"; };
 		A2000505 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
 		A2000506 /* AttachmentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentServiceTests.swift; sourceTree = "<group>"; };
+		A2000509 /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
+		A2000510 /* MarkdownFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormattingTests.swift; sourceTree = "<group>"; };
+		A2000509 /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
+		A2000510 /* MarkdownFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormattingTests.swift; sourceTree = "<group>"; };
 		A2000029 /* KeychainTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStoreTests.swift; sourceTree = "<group>"; };
 		A2000508 /* ServerConfigStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerConfigStoreTests.swift; sourceTree = "<group>"; };
 		A200002A /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -206,6 +214,7 @@
 				A2000008 /* Note.swift */,
 				A2000024 /* Note+Display.swift */,
 				A200002E /* MarkdownBlock.swift */,
+				A2000509 /* MarkdownFormatting.swift */,
 				A2000011 /* SyncMetadata.swift */,
 				A2000012 /* Tag.swift */,
 				A2000025 /* Tag+Display.swift */,
@@ -282,6 +291,7 @@
 				A2000032 /* MarkdownBlockParserTests.swift */,
 				A2000036 /* SearchViewModelTests.swift */,
 				A2000506 /* AttachmentServiceTests.swift */,
+				A2000510 /* MarkdownFormattingTests.swift */,
 				A200001C /* ModelDecodingTests.swift */,
 				A200001D /* SyncMetadataTests.swift */,
 				A2000022 /* TabNavigationTests.swift */,
@@ -460,6 +470,7 @@
 				A1000031 /* SearchViewModel.swift in Sources */,
 				A1000032 /* NoteDetailHosting.swift in Sources */,
 				A1000033 /* SearchView.swift in Sources */,
+				A1000509 /* MarkdownFormatting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,6 +494,7 @@
 				A100002F /* NoteEditorViewModelTests.swift in Sources */,
 				A1000030 /* MarkdownBlockParserTests.swift in Sources */,
 				A1000034 /* SearchViewModelTests.swift in Sources */,
+				A1000510 /* MarkdownFormattingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
