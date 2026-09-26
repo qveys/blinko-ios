@@ -21,7 +21,7 @@ final class MarkdownFormattingTests: XCTestCase {
     func testToggleBoldTwice() {
         // Toggle back off: **bold** -> bold
         let text = "**bold**"
-        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 7)
+        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 6)
         let result = MarkdownFormatting.toggleInline(.bold, in: text, selection: selection)
         XCTAssertEqual(result.text, "bold")
     }
@@ -35,7 +35,7 @@ final class MarkdownFormattingTests: XCTestCase {
         XCTAssertEqual(result.text, "**hello**")
         // Selection should be between the delimiters
         XCTAssertEqual(result.selectedOffsets().lowerBound, 2)
-        XCTAssertEqual(result.selectedOffsets().upperBound, 6)
+        XCTAssertEqual(result.selectedOffsets().upperBound, 7)
     }
 
     func testToggleBoldAtEnd() {
@@ -76,7 +76,7 @@ final class MarkdownFormattingTests: XCTestCase {
 
     func testToggleInlineUnwraps() {
         let text = "**bold**"
-        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 7)
+        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 6)
 
         let result = MarkdownFormatting.toggleInline(.bold, in: text, selection: selection)
         XCTAssertEqual(result.text, "bold")
@@ -86,7 +86,7 @@ final class MarkdownFormattingTests: XCTestCase {
 
     func testToggleBoldOnAlreadyFormatted() {
         let text = "**bold**"
-        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 7)
+        let selection = text.index(text.startIndex, offsetBy: 2)..<text.index(text.startIndex, offsetBy: 6)
 
         let result = MarkdownFormatting.toggleInline(.bold, in: text, selection: selection)
         XCTAssertEqual(result.text, "bold")
@@ -104,7 +104,7 @@ final class MarkdownFormattingTests: XCTestCase {
 
     func testToggleHeadingLevel1ThenLevel2() {
         let text = "# heading"
-        let selection = text.index(text.startIndex, offsetBy: 1)..<text.index(text.startIndex, offsetBy: 10)
+        let selection = text.index(text.startIndex, offsetBy: 1)..<text.endIndex
 
         let result = MarkdownFormatting.toggleHeading(level: 2, in: text, selection: selection)
         XCTAssertEqual(result.text, "## heading")
@@ -113,7 +113,7 @@ final class MarkdownFormattingTests: XCTestCase {
     func testToggleHeadingAlreadyLevel1() {
         // Applying level 1 to an already-level-1 heading re-strips to level 1 (idempotent)
         let text = "# heading"
-        let selection = text.index(text.startIndex, offsetBy: 1)..<text.index(text.startIndex, offsetBy: 10)
+        let selection = text.index(text.startIndex, offsetBy: 1)..<text.endIndex
 
         let result = MarkdownFormatting.toggleHeading(level: 1, in: text, selection: selection)
         XCTAssertEqual(result.text, "# heading")
