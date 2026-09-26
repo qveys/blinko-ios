@@ -111,12 +111,15 @@ final class MarkdownFormattingTests: XCTestCase {
     }
 
     func testToggleHeadingAlreadyLevel1() {
-        // Applying level 1 to an already-level-1 heading re-strips to level 1 (idempotent)
+        // The toolbar button toggles, exactly like the inline styles: applying
+        // level 1 to a line that is already level 1 strips the marker. This is
+        // what `toggleHeading` documents ("Re-applying the level a line already
+        // has strips it"), and it keeps headings consistent with bold/italic.
         let text = "# heading"
         let selection = text.index(text.startIndex, offsetBy: 1)..<text.endIndex
 
         let result = MarkdownFormatting.toggleHeading(level: 1, in: text, selection: selection)
-        XCTAssertEqual(result.text, "# heading")
+        XCTAssertEqual(result.text, "heading")
     }
 
     // MARK: - Private helpers: headingLevel(of:)
