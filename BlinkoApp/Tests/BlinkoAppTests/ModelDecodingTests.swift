@@ -101,7 +101,7 @@ final class ModelDecodingTests: XCTestCase {
 
     /// Older Foundation runtimes reject fractional seconds with `.iso8601`
     /// (hence the custom strategy); newer ones (iOS 18 / Xcode 16) accept
-    /// them. Either way, ours must decode the same fixture to the same dates.
+    /// them. Either way, ours must decode the same fixture to the same dates (to the second).
     func testStockISO8601StrategyAgreesWithOursWhenItDecodes() throws {
         let stock = JSONDecoder()
         stock.dateDecodingStrategy = .iso8601
@@ -111,7 +111,15 @@ final class ModelDecodingTests: XCTestCase {
             return // Stock rejects the payload: the custom strategy is required.
         }
         let ours = try decode([Note].self, APIFixtures.noteList)
-        XCTAssertEqual(stockNotes.map(\.updatedAt), ours.map(\.updatedAt))
+        XCTAssertEqual(stockNotes.count, ours.count)
+        for (stockNote, ourNote) in zip(stockNotes, ours) {
+            // Stock may drop the fractional part; whole seconds must agree.
+            XCTAssertEqual(
+                stockNote.updatedAt.timeIntervalSince1970,
+                ourNote.updatedAt.timeIntervalSince1970,
+                accuracy: 1.0
+            )
+        }
     }
 
     // MARK: - Attachments
