@@ -11,12 +11,18 @@ import SwiftUI
 /// Failure UX (the BLI-20 acceptance criterion): a failed save keeps the
 /// draft in the editor and offers Retry — nothing the user typed is lost.
 /// Cancelling with unsaved text asks before discarding.
+///
+/// BLI-60 adds the formatting toolbar above the keyboard: bold, italic, code,
+/// and heading levels. The transforms live in ``MarkdownFormatting`` so they
+/// stay testable; this view only wires buttons to them.
 struct NoteEditorView: View {
     @StateObject private var viewModel: NoteEditorViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var confirmDiscard = false
     @FocusState private var editorFocused: Bool
+    /// The selection the toolbar acts on, mirrored off the `TextEditor` binding.
+    @State private var selectionOffsets: (lower: Int, upper: Int) = (0, 0)
 
     /// - Parameters:
     ///   - note: the note to edit, or `nil` to create a new one.

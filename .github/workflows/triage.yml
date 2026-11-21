@@ -14,10 +14,6 @@ env:
   MANUAL_TRIAGE_COMMAND: /triage
   MANUAL_TRIAGE_ALLOWED_ASSOCIATIONS: '["OWNER","MEMBER"]'
 
-concurrency:
-  group: triage-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   triage-gate:
     name: Gate
@@ -64,6 +60,9 @@ jobs:
     if: >
       github.event_name == 'pull_request_target' ||
       needs.triage-gate.outputs.manual_triage_requested == 'true'
+    concurrency:
+      group: triage-label-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

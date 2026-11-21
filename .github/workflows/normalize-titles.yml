@@ -62,11 +62,17 @@ jobs:
               return pool[Math.floor(Math.random() * pool.length)];
             };
 
-            const issue = context.payload.pull_request ?? context.payload.issue;
-            if (!issue) {
+            const payloadItem = context.payload.pull_request ?? context.payload.issue;
+            if (!payloadItem) {
               core.info("No issue or pull_request payload found; skipping.");
               return;
             }
+            // Payload title can be stale when runs queue behind each other.
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: payloadItem.number,
+            });
 
             const originalTitle = issue.title.trim();
             if (!originalTitle) {
@@ -88,8 +94,11 @@ jobs:
               return;
             }
 
+            // Keep acronyms / camel-case proper nouns (UI, API, SwiftUI) intact.
             const lowerFirst = (value) =>
-              value.length === 0 ? value : value[0].toLowerCase() + value.slice(1);
+              value.length === 0 || /^\p{Lu}.*\p{Lu}/u.test(value.split(" ")[0])
+                ? value
+                : value[0].toLowerCase() + value.slice(1);
 
             const sentenceCase = (value) =>
               value
@@ -100,14 +109,14 @@ jobs:
             const guessType = (title) => {
               const normalized = title.toLowerCase();
               if (/\b(ci|workflow|github action|actions|pipeline)\b/.test(normalized)) return "ci";
-              if (/\b(build|release|bundle|compile|packag|xcode)\b/.test(normalized)) return "build";
-              if (/\b(test|spec|coverage|xcresult)\b/.test(normalized)) return "test";
+              if (/\b(build|release|bundle|compile|packag\w*|xcode)\b/.test(normalized)) return "build";
+              if (/\b(tests?|specs?|coverage|xcresult)\b/.test(normalized)) return "test";
               if (/\b(readme|doc|docs|documentation|guide|roadmap)\b/.test(normalized)) return "docs";
               if (/\b(refactor|cleanup|clean up|rename|reorganize)\b/.test(normalized)) return "refactor";
-              if (/\b(perf|performance|speed|faster|optimi[sz]e)\b/.test(normalized)) return "perf";
+              if (/\b(perf|performance|speed|faster|optimi[sz](e|es|ed|ation)?)\b/.test(normalized)) return "perf";
               if (/\b(style|format|lint|swiftformat|swiftlint)\b/.test(normalized)) return "style";
-              if (/\b(fix|bug|error|issue|broken|hotfix|repair|crash)\b/.test(normalized)) return "fix";
-              if (/\b(add|create|implement|introduce|support|enable|allow)\b/.test(normalized)) return "feat";
+              if (/\b(fix(es|ed)?|bugs?|errors?|issues?|broken|hotfix|repair(s|ed)?|crash(es|ed)?)\b/.test(normalized)) return "fix";
+              if (/\b(add(s|ed)?|creates?|implement(s|ed)?|introduces?|supports?|enables?|allows?)\b/.test(normalized)) return "feat";
               return "chore";
             };
 
