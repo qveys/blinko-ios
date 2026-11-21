@@ -11,7 +11,7 @@ to `main`, and on manual dispatch.
 
 | | |
 |---|---|
-| Runner | `macos-14` |
+| Runner | `macos-15` |
 | Job name | **Build and Test** (job id `build-and-test`) |
 | Steps | build for simulator → run unit tests → upload logs and results |
 | Artifacts | `ios-ci-results` (build logs + `.xcresult`), retained 14 days |

@@ -99,12 +99,27 @@ final class ModelDecodingTests: XCTestCase {
         )
     }
 
-    /// A stock decoder fails on one of the two formats; ours must not.
-    func testStockISO8601StrategyWouldFail() throws {
+    /// Older Foundation runtimes reject fractional seconds with `.iso8601`
+    /// (hence the custom strategy); newer ones (iOS 18 / Xcode 16) accept
+    /// them. Either way, ours must decode the same fixture to the same dates (to the second).
+    func testStockISO8601StrategyAgreesWithOursWhenItDecodes() throws {
         let stock = JSONDecoder()
         stock.dateDecodingStrategy = .iso8601
-        // `.iso8601` rejects fractional seconds, which most Blinko rows have.
-        XCTAssertThrowsError(try stock.decode([Note].self, from: Data(APIFixtures.noteList.utf8)))
+        let data = Data(APIFixtures.noteList.utf8)
+
+        guard let stockNotes = try? stock.decode([Note].self, from: data) else {
+            return // Stock rejects the payload: the custom strategy is required.
+        }
+        let ours = try decode([Note].self, APIFixtures.noteList)
+        XCTAssertEqual(stockNotes.count, ours.count)
+        for (stockNote, ourNote) in zip(stockNotes, ours) {
+            // Stock may drop the fractional part; whole seconds must agree.
+            XCTAssertEqual(
+                stockNote.updatedAt.timeIntervalSince1970,
+                ourNote.updatedAt.timeIntervalSince1970,
+                accuracy: 1.0
+            )
+        }
     }
 
     // MARK: - Attachments
